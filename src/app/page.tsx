@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import "@rainbow-me/rainbowkit/styles.css";
-import { HttpClient } from "./http-client/HttpClient";
-import { CoingeckoApi } from "./Coingecko-API/coingecko-API";
-const httpClient = new HttpClient("http://localhost:3000");
+// import { HttpClient } from "./http-client/HttpClient";
+// const httpClient = new HttpClient("http://localhost:3000");
 import { BLOCKCHAIN_NAME } from "rubic-sdk";
+import CalculateTokenPrice from "./Ai-Routing/GetPrice";
 import { ethers } from "ethers";
 import { TbRefresh } from "react-icons/tb";
 import { AiOutlineSwap } from "react-icons/ai";
@@ -45,26 +45,22 @@ declare global {
     ethereum?: ethers.providers.ExternalProvider;
   }
   interface CoinData {
-    chains: Array<Chain>; // Define the structure of chains if it's an array of objects
-    // Other properties...
+    chains: Array<Chain>;
   }
 }
 interface Chain {
   id: string;
   name: string;
   logoURI: string;
-  // Define other properties of the Chain if needed
 }
 interface IWalletProvider {
   [key: string]: { crossChain?: string; onChain?: string };
-  // Add other properties or constraints as needed
 }
 
 // Update the CoinData interface using Chain type
 interface CoinData {
   [x: string]: any;
-  chains?: Chain[]; // Array of objects conforming to the Chain interface
-  // Other properties...
+  chains?: Chain[];
 }
 interface Token {
   name: string;
@@ -87,6 +83,16 @@ export default function Home() {
     amount: 0,
     tokenAddress: "",
   });
+
+  useEffect(() => {
+    console.log("TO Data changed");
+    console.log(toData);
+  }, [toData]);
+  useEffect(() => {
+    console.log("From Data changed");
+    console.log(fromData);
+  }, [fromData]);
+
   const { isConnected, address } = useAccount();
   const [showAccordion1, setShowAccordion1] = useState(false);
   const [showAccordion2, setShowAccordion2] = useState(false);
@@ -110,7 +116,6 @@ export default function Home() {
     const fetchCoinData = async () => {
       try {
         const response = await axios.get("https://li.quest/v1/chains");
-        debugger;
         const temp = response?.data?.chains?.filter(
           (res: any) =>
             res?.name === "Ethereum" ||
@@ -141,6 +146,54 @@ export default function Home() {
       console.error("Error fetching trades:", error);
     }
   }
+
+  function getBlockchainName(networkName: any) {
+    switch (networkName.toLowerCase()) {
+      case "ethereum":
+        return BLOCKCHAIN_NAME.ETHEREUM;
+      case "polygon":
+        return BLOCKCHAIN_NAME.POLYGON;
+      case "optimism":
+        return BLOCKCHAIN_NAME.OPTIMISM;
+      case "avalanche":
+        return BLOCKCHAIN_NAME.AVALANCHE;
+      default:
+        throw new Error(`Unsupported network: ${networkName}`);
+    }
+  }
+
+  const calculateToAmount = async () => {
+    try {
+      const blockchainFrom = getBlockchainName(fromData.token);
+      const blockchainTo = getBlockchainName(toData.token);
+
+      const USDPriceFromToken = await CalculateTokenPrice(
+        fromData.tokenAddress,
+        blockchainFrom
+      );
+      console.log("USD PRICE for TOKEN1 ",USDPriceFromToken)
+      const USDPriceToToken = await CalculateTokenPrice(
+        toData.tokenAddress,
+        blockchainTo
+        );
+        console.log("USD PRICE for TOKEN1 ",USDPriceToToken)
+
+      const amountInUSD = fromData.amount * USDPriceFromToken.toNumber();
+      const toAmount = amountInUSD / USDPriceToToken.toNumber();
+      console.log(toAmount);
+
+      setToData({ ...toData, amount: toAmount });
+    } catch (error) {
+      console.error("Error in calculating toToken amount:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (fromData.tokenAddress && toData.tokenAddress && fromData.amount) {
+      calculateToAmount();
+    }
+  }, [fromData.tokenAddress, toData.tokenAddress, fromData.amount]);
+  
 
   const RequiredBalance = async (
     tokenAddress: string,
@@ -176,7 +229,6 @@ export default function Home() {
       const balance = await tokenContract.balanceOf(account);
 
       const formattedBalance = ethers.utils.formatUnits(balance, "ether");
-      debugger;
       if (parseFloat(formattedBalance) >= forAmount) {
         setIsBalance(true);
       } else {
@@ -204,7 +256,6 @@ export default function Home() {
         }
       } else {
         console.error("Ethereum provider (window.ethereum) not found.");
-        // Handle the case when window.ethereum is undefined or not available
       }
     }
 
@@ -212,8 +263,6 @@ export default function Home() {
   }, []);
 
   const handleNetworkRender = async (tokenName: any, type: any) => {
-    // const {isConnected}=useAccount();
-    // https://tokens.rubic.exchange/api/v1/tokens/?page=1&pageSize=200&network=polygon
     try {
       const res = await axios.get(
         `https://tokens.rubic.exchange/api/v1/tokens/?page=1&pageSize=200&network=${tokenName}`
@@ -263,52 +312,54 @@ export default function Home() {
     });
   };
 
-  useEffect(() => {
-    if (fromData?.network) {
-      const timer = setTimeout(async () => {
-        try {
-          const coingeckoApi = new CoingeckoApi(httpClient);
-          const convertedValue: any = await coingeckoApi.convertTokenValue(
-            fromData?.network
-          );
-          const tempValue = fromData?.network.toLowerCase();
-          setConvertedAmount(convertedValue[tempValue]["usd"]);
-          console.log(convertedValue[tempValue]["usd"]);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }, 3000);
+  // useEffect(() => {
+  //   if (fromData?.network) {
+  //     console.log("fromData Network", fromData.network);
+  //     const timer = setTimeout(async () => {
+  //       try {
+  //         const coingeckoApi = new CoingeckoApi(httpClient);
+  //         const convertedValue: any = await coingeckoApi.convertTokenValue(
+  //           fromData?.network
+  //         );
+  //         const tempValue = fromData?.network.toLowerCase();
+  //         console.log("tempValue", tempValue);
+  //         setConvertedAmount(convertedValue[tempValue]["usd"]);
+  //         console.log(convertedValue[tempValue]["usd"]);
+  //       } catch (error) {
+  //         console.error("Error fetching data:", error);
+  //       }
+  //     }, 3000);
 
-      return () => clearTimeout(timer);
-    }
-  }, [fromData?.network]);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [fromData?.network]);
 
-  useEffect(() => {
-    if (convertedAmount && toData?.network) {
-      console.log("Printing the converted amount", convertedAmount);
+  // useEffect(() => {
+  //   if (convertedAmount && toData?.network) {
+  //     console.log("Printing the converted amount", convertedAmount);
+  //     console.log("Value being passed toData.network", toData.network);
 
-      const timer = setTimeout(async () => {
-        try {
-          const coingeckoApi = new CoingeckoApi(httpClient);
-          const convertedValue: any = await coingeckoApi.convertTokenValue(
-            toData?.network
-          );
-          debugger;
-          const tempValue: any = toData?.network.toLowerCase();
-          const amountInUSD = fromData?.amount * convertedAmount;
-          const amountInTargetToken =
-            amountInUSD / convertedValue[tempValue]["usd"];
-          console.log(amountInTargetToken);
-          setToData({ ...toData, amount: amountInTargetToken });
-          fetchTrades();
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }, 3000);
+  //     const timer = setTimeout(async () => {
+  //       try {
+  //         const coingeckoApi = new CoingeckoApi(httpClient);
+  //         const convertedValue: any = await coingeckoApi.convertTokenValue(
+  //           toData?.network
+  //         );
+  //         const tempValue: any = toData?.network.toLowerCase();
+  //         const amountInUSD = fromData?.amount * convertedAmount;
+  //         const amountInTargetToken =
+  //           amountInUSD / convertedValue[tempValue]["usd"];
+  //         console.log(amountInTargetToken);
+  //         setToData({ ...toData, amount: amountInTargetToken });
+  //         fetchTrades();
+  //       } catch (error) {
+  //         console.error("Error fetching data:", error);
+  //       }
+  //     }, 3000);
 
-      return () => clearTimeout(timer);
-    }
-  }, [convertedAmount, toData?.network]);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [convertedAmount, toData?.network]);
 
   useEffect(() => {
     console.log("Prinintng isBalance", isBalance);
@@ -328,7 +379,13 @@ export default function Home() {
       }}
       className="relative"
     >
-      <Image src="/bg.png" alt="bg" width={100} height={100} className="absolute top-0 left-0 w-full h-full" />
+      <Image
+        src="/bg.png"
+        alt="bg"
+        width={100}
+        height={100}
+        className="absolute top-0 left-0 w-full h-full"
+      />
       <div
         style={{
           marginTop: "9vh",
@@ -435,16 +492,16 @@ export default function Home() {
                         <li
                           onClick={() => {
                             handleTokenSelection1(coin?.name, coin?.logoURI);
-                            console.log("coin", coin);
                           }}
                         >
                           {value?.map((network: any, index: any) => (
                             <div
                               key={index}
                               className="flex justify-between space-y-2 space-x-3 hover:bg-black px-1 my-1 p-1 rounded-sm"
-                              onClick={() =>
-                                handleNetworkset1(network?.name, network)
-                              }
+                              onClick={() => {
+                                console.log("SelectedNetwork", network);
+                                handleNetworkset1(network?.name, network);
+                              }}
                             >
                               <Image
                                 src={network?.image}
@@ -542,7 +599,10 @@ export default function Home() {
                   {coinData?.map((coin: any) => (
                     <AccordionItem key={coin?.id} value={coin?.id}>
                       <AccordionTrigger
-                        onClick={() => handleNetworkRender(coin?.name, "to")}
+                        onClick={() => {
+                          console.log("coinsData", coin);
+                          handleNetworkRender(coin?.name, "to");
+                        }}
                       >
                         <Image
                           src={coin?.logoURI}
@@ -585,7 +645,6 @@ export default function Home() {
               ) : (
                 <Input
                   type="number"
-                  // placeholder="Enter an Amount"
                   value={toData?.amount}
                   disabled
                   className="amount-comp text-neutral-400 w-full flex mt-10 bg-transparent text-2xl border-none focus:shadow-none float-right text-right"
@@ -651,7 +710,7 @@ export default function Home() {
             padding: "15px",
             display: "flex",
             paddingTop: "10px",
-            paddingBottom:"30px",
+            paddingBottom: "30px",
             gap: "10px",
             borderBottomLeftRadius: "20px",
             borderBottomRightRadius: "20px",
