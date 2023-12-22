@@ -404,6 +404,7 @@ export default function Home() {
                       handleNetworkRender={handleNetworkRender}
                       handleTokenSelection={handleTokenSelection1}
                       type={'from'}
+                      // setShowAccord={setShowAccordion1}
                     />
                   )}
                   <input
@@ -539,6 +540,7 @@ export default function Home() {
                       handleNetworkRender={handleNetworkRender}
                       handleTokenSelection={handleTokenSelection2}
                       type={'to'}
+                      // setShowAccord={setShowAccordion2}
                     />
                   )}
                   <input
