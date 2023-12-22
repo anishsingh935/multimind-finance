@@ -5,7 +5,7 @@ import axios from "axios";
 
 import "@rainbow-me/rainbowkit/styles.css";
 import { Button } from "@/components/ui/button";
-import { BLOCKCHAIN_NAME } from "rubic-sdk";
+import { BLOCKCHAIN_NAME , Token as TOKEN , SDK, WalletProvider, CHAIN_TYPE, Configuration } from "rubic-sdk";
 import { ethers } from "ethers";
 import { TbRefresh } from "react-icons/tb";
 import { AiOutlineSwap } from "react-icons/ai";
@@ -15,7 +15,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CheckBalance } from "./Ai-Routing/checkbalance";
-// import CalculateTokenPrice from "./Ai-Routing/GetPrice";
 import calculateTrades from "./Ai-Routing/Trades";
 import {
   Accordion,
@@ -23,12 +22,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-// import { Input } from "@/components/ui/input";
-// import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import RouteCard from "@/components/route-card";
 import MobileHome from "./mobileMUltiMind";
 import DialogModal from "@/components/dialogModal";
+import configuration from './rubic';
 
 type MyBlockchainName = "ETHEREUM" | "POLYGON" | "AVALANCHE" | "SOLANA";
 
@@ -91,6 +89,8 @@ export default function Home() {
   const [account, setAccount] = useState<string | null>(null);
   const [openDilog, setOpenDilog] = useState(false);
   const [providerArray, setProviderArray] = useState<any[]>([]);
+  const [searchInput,setSearchInput] = useState("");
+  const [TradeClicked , setTradeClicked] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchCoinData = async () => {
@@ -140,6 +140,19 @@ export default function Home() {
     }
   }
 
+  const DisplayTokenDetails = async (searchedAddress: string) => {
+    try {
+        console.log("searchedAddress", searchedAddress);
+        const tokendata = await TOKEN.createToken({
+            blockchain: BLOCKCHAIN_NAME.ETHEREUM,
+            address: '0xdac17f958d2ee523a2206206994597c13d831ec7'
+        });
+        console.log(tokendata);
+    } catch (error) {
+        console.error("An error occurred while fetching token details:", error);
+    }
+}
+
   const calculateToAmount = async () => {
     try {
       let USDPriceFromToken: any = fromData.usdprice;
@@ -162,11 +175,11 @@ export default function Home() {
   }, [fromData.tokenAddress, toData.tokenAddress, fromData.amount]);
 
   const handleNetworkRender = async (tokenName: any, type: any) => {
-    debugger;
     try {
       const res = await axios.get(
         `https://tokens.rubic.exchange/api/v1/tokens/?page=1&pageSize=200&network=${tokenName}`
       );
+      console.log(res);
       if (type === "from") {
         setFromData({ ...fromData, token: tokenName });
       }
@@ -188,10 +201,62 @@ export default function Home() {
     if (validNumber.test(amount)) {
       setFromData({ ...fromData, amount: Number(amount) });
     } else {
-      // If the input is not a valid number, revert to the last valid value
       e.target.value = fromData.amount.toString();
     }
   };
+
+  const configureWallet = async () => {
+  
+    if (isConnected && address) {
+      const walletProvider : any = {
+        [CHAIN_TYPE.EVM]: {
+          address,
+          core: window.ethereum
+        }
+      };
+  
+      try {
+        const updatedConfiguration :any = { ...configuration, walletProvider };
+        const sdk = await SDK.createSDK(updatedConfiguration);
+        sdk.updateWalletProvider(walletProvider);
+        console.log("SDK configuration successful");
+      } catch (error) {
+        console.error("Error in SDK configuration:", error);
+      }
+    }
+  };
+  
+
+  useEffect(() => {
+  configureWallet();
+}, [address, isConnected]);
+  
+useEffect(() => {
+  console.log("USeEffect rendered");
+  // debugger;
+  console.log("Trade clicked",TradeClicked)
+  if (TradeClicked) {
+    console.log("swap is performed useeffect")
+   
+  // console.log(swapData);
+    performSwap(TradeClicked);
+  }
+}, [TradeClicked]);
+
+const performSwap = async (bestTrade : any) => {
+  console.log("Swap is performed")
+  console.log("best Trade",bestTrade);
+  debugger;
+  try {
+    const receipt = await bestTrade.swap({
+      onConfirm: (hash : any) => console.log('Transaction Hash:', hash),
+      onError: (error : any) => console.error('Swap Error:', error)
+    });
+    console.log('Trade executed:', receipt);
+  } catch (error) {
+    console.error('Error executing trade:', error);
+  }
+};
 
   const handleTokenSelection1 = (tokenName: string, tokenImage: string) => {
     const selectedToken: Token = {
@@ -400,6 +465,7 @@ export default function Home() {
                       handleNetworkRender={handleNetworkRender}
                       handleTokenSelection={handleTokenSelection1}
                       type={'from'}
+                      DisplayTokenDetails ={DisplayTokenDetails}
                     />
                   )}
                   <input
@@ -535,6 +601,7 @@ export default function Home() {
                       handleNetworkRender={handleNetworkRender}
                       handleTokenSelection={handleTokenSelection2}
                       type={'to'}
+                      setSearchInput={setSearchInput}
                     />
                   )}
                   <input
@@ -597,7 +664,7 @@ export default function Home() {
             >
               {providerArray?.map((data, index) => (
                 <div key={index}>
-                  <RouteCard data={data} index={index} />
+                  <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
                 </div>
               ))}
             </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from './ui/input';
 import {
   Accordion,
@@ -7,6 +7,7 @@ import {
   AccordionTrigger,
 } from './ui/accordion';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 
 function DialogModal({
   coinData,
@@ -14,13 +15,17 @@ function DialogModal({
   handleTokenSelection,
   value,
   handleNetworkset,
-  type
+  type,
+  DisplayTokenDetails
 }:{coinData:any,
   handleNetworkRender:Function,
   handleTokenSelection:Function,
   value:any,
   handleNetworkset:Function,
-  type:any}) {
+  DisplayTokenDetails:Function
+  type:any})
+  {
+    const [searchInput,setSearchInput] = useState("");
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="w-full max-w-[664px] max-h-[595px] rounded-lg flex flex-col gap-6 p-6" style={{
@@ -34,6 +39,10 @@ function DialogModal({
             <Input
               placeholder="Search"
               className="w-full h-10 px-4 rounded-lg bg-[#27272A] text-white"
+              // onChange={(e:any) => DisplayTokenDetails(e.target.value)}
+              onChange={(e:any) => {
+                setSearchInput(e.target.value);
+              }}
             />
           </div>
         </div>
@@ -56,7 +65,7 @@ function DialogModal({
                 </AccordionTrigger>
                 <div style={{borderRadius:"16px",margin:"10px 15px",background:"var(--Dark-80, #27272A)",border:"1px solid var(--Dark-70, #3F3F46)", padding:"0px 15px"}}>
                   <AccordionContent className="text-start list-none h-32 overflow-y-auto ml-0 no-scrollbar border-2xl">
-                    {value?.map((network:any, index:any) => (
+                    {(value)?.map((network:any, index:any) => (
                       <div
                         key={index}
                         className="flex items-center px-2 my-1  cursor-pointer"
