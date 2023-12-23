@@ -24,7 +24,7 @@ const RouteCard = ({ data, index , setTradeClicked }: Props) => {
     console.log("data saved")
   };
   return (
-    <div className="cardWidth bg-[#27272a] rounded-[16px] " onClick={handleTradeClick}>
+    <div className="cardWidth bg-[#27272a] rounded-[16px] " style={{cursor:"pointer"}} onClick={handleTradeClick}>
       {index === 0 && (
         <Image
           alt="bar"
