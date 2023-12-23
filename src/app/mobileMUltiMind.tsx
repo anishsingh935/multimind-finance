@@ -6,8 +6,6 @@ import axios from "axios";
 import '@rainbow-me/rainbowkit/styles.css';
 import { CheckBalance } from "./Ai-Routing/checkbalance";
 import { Button } from "@/components/ui/button";
-// import CalculateTokenPrice from "./Ai-Routing/GetPrice";
-import { BLOCKCHAIN_NAME } from "rubic-sdk";
 import { ethers } from 'ethers';
 import { TbRefresh } from "react-icons/tb";
 import { AiOutlineSwap } from "react-icons/ai";
@@ -23,11 +21,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { BLOCKCHAIN_NAME, CrossChainTrade,OnChainTrade, SDK, WalletProvider, CHAIN_TYPE, Configuration } from "rubic-sdk";
 import { Input } from "@/components/ui/input";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import RouteCard from "@/components/route-card";
 import DialogModal from "@/components/dialogModal";
+import { Alchemy ,Network } from "alchemy-sdk";
+import configuration from './rubic';
 
 
 declare global {
@@ -54,6 +55,9 @@ interface CoinData {
 interface Token {
   name: string;
   image: string;
+}
+interface apiKey{
+
 }
 
 export default function MobileHome() {
@@ -89,7 +93,36 @@ export default function MobileHome() {
   const [providerArray, setProviderArray] = useState<any[]>([]); 
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
   const [account, setAccount] = useState<string | null>(null);
+  const [TradeClicked, setTradeClicked] = useState<any>();
   type MyBlockchainName = 'ETHEREUM' | 'POLYGON'  | 'AVALANCHE' | 'SOLANA';
+
+  const getAlchemyConfig = (blockchainName:any) => {
+    const apiKeyMapping:any = {
+      'Ethereum': 'R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU',
+      'Polygon': '6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP'
+    };
+    const networkMapping:any = {
+      'Ethereum': Network.ETH_MAINNET,
+      'Polygon': Network.MATIC_MAINNET
+    };
+    return {
+      apiKey: apiKeyMapping[blockchainName],
+      network: networkMapping[blockchainName]
+    };
+  };
+
+
+  const fetchTokenBalance = async (address:any, tokenAddress:any, blockchain:any) => {
+    const alchemyConfig = getAlchemyConfig(blockchain);
+    const alchemy = new Alchemy(alchemyConfig);
+    try {
+      const data = await alchemy.core.getTokenBalances(address, [tokenAddress]);
+      console.log("Token balance for Address", data);
+      return data.tokenBalances[0].tokenBalance;
+    } catch (error) {
+      console.error("Error fetching token balance:", error);
+    }
+  };
  
 
 
@@ -200,6 +233,75 @@ export default function MobileHome() {
       calculateToAmount();
     }
   }, [fromData.tokenAddress, toData.tokenAddress, fromData.amount]);
+
+
+  const configureWallet = async () => {
+
+    if (isConnected && address) {
+      const walletProvider: any = {
+        [CHAIN_TYPE.EVM]: {
+          address,
+          core: window.ethereum
+        }
+      };
+
+      try {
+        const updatedConfiguration: any = { ...configuration, walletProvider };
+        const sdk = await SDK.createSDK(updatedConfiguration);
+        sdk.updateWalletProvider(walletProvider);
+        console.log("SDK configuration successful");
+      } catch (error) {
+        console.error("Error in SDK configuration:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    configureWallet();
+  }, [address, isConnected]);
+
+
+  useEffect(() => {
+    if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
+      fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
+        .then((balance:any) => {
+          if (parseFloat(balance) >= fromData.amount) {
+            performSwap(TradeClicked);
+          } else {
+            alert(`Insufficient Balance for Transaction`);
+            console.log("Insufficient Balance");
+          }
+        })
+        .catch(error => console.error(error));
+    }
+  }, [TradeClicked, fromData]);
+  
+  
+
+  const performSwap = async (bestTrade: any) => {
+
+    console.log(bestTrade.trade);
+    try {
+
+      const trade = bestTrade.trade as CrossChainTrade | OnChainTrade ;
+
+      const receipt = trade.swap(
+        {
+          onConfirm: (hash: any) => console.log('Transaction Hash:', hash),
+        }).then(hash => {
+          console.log("swap function called success");
+          alert(`Transaction was successfull ${hash}`);
+          console.log(hash);
+        }).catch(err => {
+          alert("SWAP TRANSACTION FAILED");
+          console.log("swap function called failed");
+          console.error(err);
+        });
+      console.log('Trade executed:', receipt);
+    } catch (error) {
+      console.error('Error executing trade:', error);
+    }
+  };
 
 
   return (
@@ -348,7 +450,7 @@ export default function MobileHome() {
       >
         {providerArray?.map((data, index) => (
           <div key={index}>
-            <RouteCard data={data} index={index} />
+            <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
         </div>
         ))}
       </div>}
