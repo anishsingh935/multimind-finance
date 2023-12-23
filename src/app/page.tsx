@@ -10,6 +10,7 @@ import { ethers } from "ethers";
 import { TbRefresh } from "react-icons/tb";
 import { AiOutlineSwap } from "react-icons/ai";
 import CircleImage from "@/app/CircleImage.svg";
+import { ToastContainer, toast } from 'react-toastify';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -256,8 +257,16 @@ export default function Home() {
           if (parseFloat(balance) >= fromData.amount) {
             performSwap(TradeClicked);
           } else {
-            alert(`Insufficient Balance for Transaction`);
-            console.log("Insufficient Balance");
+            toast.error('Insufficient Balance', {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+              });
           }
         })
         .catch(error => console.error(error));
@@ -278,10 +287,28 @@ export default function Home() {
           onConfirm: (hash: any) => console.log('Transaction Hash:', hash),
         }).then(hash => {
           console.log("swap function called success");
-          alert(`Transaction was successfull ${hash}`);
+          toast.success(`Transaction was successfull ${hash}`, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            });
           console.log(hash);
-        }).catch(err => {
-          alert("SWAP TRANSACTION FAILED");
+        }).catch(err =>{
+          toast.error('Swap Function Failed', {
+            position: "bottom-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            });
           console.log("swap function called failed");
           console.error(err);
         });

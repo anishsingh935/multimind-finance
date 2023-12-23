@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+import { ToastContainer, toast } from 'react-toastify';
 import '@rainbow-me/rainbowkit/styles.css';
 import { CheckBalance } from "./Ai-Routing/checkbalance";
 import { Button } from "@/components/ui/button";
@@ -268,7 +268,16 @@ export default function MobileHome() {
           if (parseFloat(balance) >= fromData.amount) {
             performSwap(TradeClicked);
           } else {
-            alert(`Insufficient Balance for Transaction`);
+            toast.error('Insufficient Balance for Transfer', {
+              position: "bottom-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+              });;
             console.log("Insufficient Balance");
           }
         })
@@ -290,10 +299,28 @@ export default function MobileHome() {
           onConfirm: (hash: any) => console.log('Transaction Hash:', hash),
         }).then(hash => {
           console.log("swap function called success");
-          alert(`Transaction was successfull ${hash}`);
+          toast.success(`Transaction was successfull ${hash}`, {
+            position: "bottom-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            });
           console.log(hash);
         }).catch(err => {
-          alert("SWAP TRANSACTION FAILED");
+          toast.error('Transaction Failed', {
+            position: "bottom-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            });;
           console.log("swap function called failed");
           console.error(err);
         });
