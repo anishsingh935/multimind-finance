@@ -119,14 +119,14 @@ export default function Home() {
     fetchCoinData();
   }, []);
 
-  const getAlchemyConfig = (blockchainName) => {
-    const apiKeyMapping = {
-      'ethereum': 'R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU',
-      'polygon': '6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP'
+  const getAlchemyConfig = (blockchainName:any) => {
+    const apiKeyMapping:any = {
+      'Ethereum': 'R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU',
+      'Polygon': '6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP'
     };
-    const networkMapping = {
-      'ethereum': Network.ETH_MAINNET,
-      'polygon': Network.MATIC_MAINNET
+    const networkMapping:any = {
+      'Ethereum': Network.ETH_MAINNET,
+      'Polygon': Network.MATIC_MAINNET
     };
     return {
       apiKey: apiKeyMapping[blockchainName],
@@ -134,7 +134,7 @@ export default function Home() {
     };
   };
 
-  const fetchTokenBalance = async (address, tokenAddress, blockchain) => {
+  const fetchTokenBalance = async (address:any, tokenAddress:any, blockchain:any) => {
     const alchemyConfig = getAlchemyConfig(blockchain);
     const alchemy = new Alchemy(alchemyConfig);
     try {
@@ -252,7 +252,7 @@ export default function Home() {
   useEffect(() => {
     if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
       fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
-        .then(balance => {
+        .then((balance:any) => {
           if (parseFloat(balance) >= fromData.amount) {
             performSwap(TradeClicked);
           } else {
@@ -354,7 +354,7 @@ export default function Home() {
           </nav>
           <div
             style={{
-              marginTop: "6vh",
+              marginTop: "-5vh",
               width: "50%",
               background: "#18181B",
               borderRadius: "20px",
@@ -503,7 +503,6 @@ export default function Home() {
                       handleNetworkRender={handleNetworkRender}
                       handleTokenSelection={handleTokenSelection1}
                       type={'from'}
-                      DisplayTokenDetails={DisplayTokenDetails}
                     />
                   )}
                   <input
@@ -639,7 +638,6 @@ export default function Home() {
                       handleNetworkRender={handleNetworkRender}
                       handleTokenSelection={handleTokenSelection2}
                       type={'to'}
-                      setSearchInput={setSearchInput}
                     />
                   )}
                   <input

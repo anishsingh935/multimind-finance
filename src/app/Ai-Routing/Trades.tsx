@@ -19,23 +19,43 @@ async function calculateCrossChainTrades(fromBlockchain: MyBlockchainName, fromT
                 fromAmount,
                 toTokenAddress
             );
+            debugger;
 
-            trades.forEach(trade => {
-                if (trade.error) {
-                    console.error(`error: ${trade.error}`);
+            trades.forEach((trade) => {
+                console.log(trade);
+            
+                if ('feeInfo' in trade && trade.feeInfo && 'fixedFee' in trade.feeInfo && trade.feeInfo.fixedFee) {
+                    // Check if 'error' property exists if needed
+                    if ('error' in trade && trade.error) {
+                        console.log(`error: ${trade.error}`);
+                    } else {
+                        const fixedFeeAmount = (trade.feeInfo.fixedFee as { amount?: any }).amount;
+            
+                        if (fixedFeeAmount) {
+                            const providerObj: any = {
+                                dexName: trade.type, // Assuming trade type is accessible
+                                protocolFee: fixedFeeAmount.toFormat(3),
+                                tokenSymbol: trade.to?.symbol,
+                                tokenAmount: trade.to?.tokenAmount?.toFormat(3),
+                                estimatedTime: "Unavailable",
+                                tokenUriLink: "Unavailable",
+                                trade: trade,
+                            };
+                            providerArray.push(providerObj);
+                        } else {
+                            // Handle the case where 'amount' does not exist in fixedFee
+                            console.log("Amount information not available for fixed fee in this trade");
+                        }
+                    }
                 } else {
-                    const providerObj: any = {
-                        dexName: trade.type, // Assuming trade type is accessible
-                        protocolFee: trade.feeInfo?.fixedFee?.amount?.toFormat(3),
-                        tokenSymbol: trade.to?.symbol,
-                        tokenAmount: trade.to?.tokenAmount?.toFormat(3),
-                        estimatedTime: "Unavailable",
-                        tokenUriLink: "Unavailable",
-                        trade: trade
-                    };
-                    providerArray.push(providerObj);
+                    // Handle the case where 'feeInfo' or 'fixedFee' does not exist
+                    console.log("Fee information or fixed fee not available for this trade");
                 }
             });
+            
+            
+            
+                       
         } else {
             // Cross-chain trade
             const wrappedTrades = await sdk.crossChainManager.calculateTrade(
@@ -43,6 +63,7 @@ async function calculateCrossChainTrades(fromBlockchain: MyBlockchainName, fromT
                 fromAmount,
                 { blockchain: BLOCKCHAIN_NAME[toBlockchain], address: toTokenAddress }
             );
+            debugger;
 
             wrappedTrades.forEach(wrappedTrade => {
                 if (wrappedTrade.error) {
@@ -50,9 +71,9 @@ async function calculateCrossChainTrades(fromBlockchain: MyBlockchainName, fromT
                 } else {
                     const providerObj: any = {
                         dexName: wrappedTrade.tradeType,
-                        protocolFee: wrappedTrade.trade.feeInfo?.rubicProxy?.fixedFee?.amount?.toFormat(3),
-                        tokenSymbol: wrappedTrade.trade.to?.symbol,
-                        tokenAmount: wrappedTrade.trade.to?.tokenAmount?.toFormat(3),
+                        protocolFee: wrappedTrade.trade?.feeInfo?.rubicProxy?.fixedFee?.amount?.toFormat(3),
+                        tokenSymbol: wrappedTrade.trade?.to?.symbol,
+                        tokenAmount: wrappedTrade.trade?.to?.tokenAmount?.toFormat(3),
                         estimatedTime: "Unavailable",
                         tokenUriLink: "Unavailable",
                         trade: wrappedTrade.trade
@@ -60,6 +81,7 @@ async function calculateCrossChainTrades(fromBlockchain: MyBlockchainName, fromT
                     providerArray.push(providerObj);
                 }
             });
+            
         }
 
         console.log(providerArray);

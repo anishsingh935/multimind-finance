@@ -56,6 +56,9 @@ interface Token {
   name: string;
   image: string;
 }
+interface apiKey{
+
+}
 
 export default function MobileHome() {
   
@@ -93,14 +96,14 @@ export default function MobileHome() {
   const [TradeClicked, setTradeClicked] = useState<any>();
   type MyBlockchainName = 'ETHEREUM' | 'POLYGON'  | 'AVALANCHE' | 'SOLANA';
 
-  const getAlchemyConfig = (blockchainName) => {
-    const apiKeyMapping = {
-      'ethereum': 'R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU',
-      'polygon': '6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP'
+  const getAlchemyConfig = (blockchainName:any) => {
+    const apiKeyMapping:any = {
+      'Ethereum': 'R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU',
+      'Polygon': '6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP'
     };
-    const networkMapping = {
-      'ethereum': Network.ETH_MAINNET,
-      'polygon': Network.MATIC_MAINNET
+    const networkMapping:any = {
+      'Ethereum': Network.ETH_MAINNET,
+      'Polygon': Network.MATIC_MAINNET
     };
     return {
       apiKey: apiKeyMapping[blockchainName],
@@ -109,7 +112,7 @@ export default function MobileHome() {
   };
 
 
-  const fetchTokenBalance = async (address, tokenAddress, blockchain) => {
+  const fetchTokenBalance = async (address:any, tokenAddress:any, blockchain:any) => {
     const alchemyConfig = getAlchemyConfig(blockchain);
     const alchemy = new Alchemy(alchemyConfig);
     try {
@@ -261,7 +264,7 @@ export default function MobileHome() {
   useEffect(() => {
     if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
       fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
-        .then(balance => {
+        .then((balance:any) => {
           if (parseFloat(balance) >= fromData.amount) {
             performSwap(TradeClicked);
           } else {
@@ -447,7 +450,7 @@ export default function MobileHome() {
       >
         {providerArray?.map((data, index) => (
           <div key={index}>
-            <RouteCard data={data} index={index} />
+            <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
         </div>
         ))}
       </div>}
