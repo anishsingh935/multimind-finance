@@ -300,7 +300,7 @@ export default function Home() {
           console.log(hash);
         }).catch(err =>{
           toast.error('Swap Function Failed', {
-            position: "bottom-center",
+            position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
             closeOnClick: true,
