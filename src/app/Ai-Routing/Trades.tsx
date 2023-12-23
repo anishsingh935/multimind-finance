@@ -1,41 +1,70 @@
-import { BLOCKCHAIN_NAME, EvmCrossChainTrade } from 'rubic-sdk';
+import { BLOCKCHAIN_NAME, EvmCrossChainTrade, EvmOnChainTrade, OnChainTrade } from 'rubic-sdk';
 import configuration from '../rubic';
-import { SDK } from 'rubic-sdk';
+import { SDK  } from 'rubic-sdk';
 
-type MyBlockchainName = 'ETHEREUM' | 'POLYGON'  | 'AVALANCHE' | 'SOLANA';
+type MyBlockchainName = 'ETHEREUM' | 'POLYGON' | 'AVALANCHE' | 'SOLANA';
 
-async function calculateCrossChainTrades(fromBlockchain: MyBlockchainName , fromTokenAddress: any, toBlockchain: MyBlockchainName, toTokenAddress: any, fromAmount: any) {
+async function calculateCrossChainTrades(fromBlockchain: MyBlockchainName, fromTokenAddress: any, toBlockchain: MyBlockchainName, toTokenAddress: any, fromAmount: any) {
     let sdk;
+    const providerArray: any = [];
+
     try {
-        debugger;
         sdk = await SDK.createSDK(configuration);
-        const wrappedTrades = await sdk.crossChainManager.calculateTrade(
-            { blockchain: BLOCKCHAIN_NAME[fromBlockchain], address: fromTokenAddress },
-            fromAmount,
-            { blockchain: BLOCKCHAIN_NAME[toBlockchain], address: toTokenAddress }
-        );
-        const providerArray:any = []
 
-        // console.log(wrappedTrades);
-        wrappedTrades.forEach(wrappedTrade => {
-            if (wrappedTrade.error) {
-                console.error(`error: ${wrappedTrade.error}`);
-            } else {
-                const providerObj:any = {}
-                providerObj.dexName = wrappedTrade?.tradeType;
-                providerObj.protocolFee = wrappedTrade?.trade?.feeInfo?.rubicProxy?.fixedFee?.amount?.toFormat(3);
-                providerObj.tokenSymbol = wrappedTrade?.trade?.to?.symbol; 
-                providerObj.tokenAmount = wrappedTrade?.trade?.to?.tokenAmount?.toFormat(3);
-                providerObj.estimatedTime = "Unavailable"; 
-                providerObj.tokenUriLink = "Unavailable"; 
-                providerArray.push(providerObj);
-            }
+        // Check if it's an on-chain trade (same blockchain) or cross-chain trade
+        if (fromBlockchain === toBlockchain) {
+            // On-chain trade
+            const trades  = await sdk.onChainManager.calculateTrade(
+                { blockchain: BLOCKCHAIN_NAME[fromBlockchain], address: fromTokenAddress },
+                fromAmount,
+                toTokenAddress
+            );
 
-        });
+            trades.forEach(trade => {
+                if (trade.error) {
+                    console.error(`error: ${trade.error}`);
+                } else {
+                    const providerObj: any = {
+                        dexName: trade.type, // Assuming trade type is accessible
+                        protocolFee: trade.feeInfo?.fixedFee?.amount?.toFormat(3),
+                        tokenSymbol: trade.to?.symbol,
+                        tokenAmount: trade.to?.tokenAmount?.toFormat(3),
+                        estimatedTime: "Unavailable",
+                        tokenUriLink: "Unavailable",
+                        trade: trade
+                    };
+                    providerArray.push(providerObj);
+                }
+            });
+        } else {
+            // Cross-chain trade
+            const wrappedTrades = await sdk.crossChainManager.calculateTrade(
+                { blockchain: BLOCKCHAIN_NAME[fromBlockchain], address: fromTokenAddress },
+                fromAmount,
+                { blockchain: BLOCKCHAIN_NAME[toBlockchain], address: toTokenAddress }
+            );
+
+            wrappedTrades.forEach(wrappedTrade => {
+                if (wrappedTrade.error) {
+                    console.error(`error: ${wrappedTrade.error}`);
+                } else {
+                    const providerObj: any = {
+                        dexName: wrappedTrade.tradeType,
+                        protocolFee: wrappedTrade.trade.feeInfo?.rubicProxy?.fixedFee?.amount?.toFormat(3),
+                        tokenSymbol: wrappedTrade.trade.to?.symbol,
+                        tokenAmount: wrappedTrade.trade.to?.tokenAmount?.toFormat(3),
+                        estimatedTime: "Unavailable",
+                        tokenUriLink: "Unavailable",
+                        trade: wrappedTrade.trade
+                    };
+                    providerArray.push(providerObj);
+                }
+            });
+        }
 
         console.log(providerArray);
         return providerArray;
-        
+
     } catch (error) {
         console.error("Error in Rubic SDK operation:", error);
     }

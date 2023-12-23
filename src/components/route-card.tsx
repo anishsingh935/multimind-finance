@@ -5,6 +5,7 @@ import "./cardstyle.css"
 type Props = {
   data: any;
   index: number;
+  setTradeClicked: React.Dispatch<React.SetStateAction<any[]>>;
 };
 
 const imageArray =[
@@ -16,9 +17,14 @@ const imageArray =[
   'https://app.rubic.exchange/assets/images/icons/providers/bridge/avalanche-bridge.svg'
 ]
 
-const RouteCard = ({ data, index }: Props) => {
+const RouteCard = ({ data, index , setTradeClicked }: Props) => {
+  const handleTradeClick = () => {
+    console.log(data)
+    setTradeClicked(data);
+    console.log("data saved")
+  };
   return (
-    <div className="cardWidth bg-[#27272a] rounded-[16px]">
+    <div className="cardWidth bg-[#27272a] rounded-[16px] " onClick={handleTradeClick}>
       {index === 0 && (
         <Image
           alt="bar"

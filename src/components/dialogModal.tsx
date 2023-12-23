@@ -8,6 +8,7 @@ import {
 } from './ui/accordion';
 import Image from 'next/image';
 import axios from 'axios';
+import { useSearchParams } from 'next/navigation';
 
 function DialogModal({
   coinData,
