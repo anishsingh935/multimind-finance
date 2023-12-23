@@ -5,7 +5,7 @@ import axios from "axios";
 
 import "@rainbow-me/rainbowkit/styles.css";
 import { Button } from "@/components/ui/button";
-import { BLOCKCHAIN_NAME , Token as TOKEN , SDK, WalletProvider, CHAIN_TYPE, Configuration } from "rubic-sdk";
+import { BLOCKCHAIN_NAME, CrossChainTrade,OnChainTrade, SDK, WalletProvider, CHAIN_TYPE, Configuration } from "rubic-sdk";
 import { ethers } from "ethers";
 import { TbRefresh } from "react-icons/tb";
 import { AiOutlineSwap } from "react-icons/ai";
@@ -27,7 +27,7 @@ import RouteCard from "@/components/route-card";
 import MobileHome from "./mobileMUltiMind";
 import DialogModal from "@/components/dialogModal";
 import configuration from './rubic';
-
+import { Alchemy, Network } from "alchemy-sdk";
 type MyBlockchainName = "ETHEREUM" | "POLYGON" | "AVALANCHE" | "SOLANA";
 
 declare global {
@@ -57,7 +57,6 @@ interface Token {
 }
 
 export default function Home() {
-  const [isBalance, setIsBalance] = useState(false);
 
   const [fromData, setFromData] = useState({
     token: "",
@@ -88,9 +87,11 @@ export default function Home() {
     useState<ethers.providers.Web3Provider | null>(null);
   const [account, setAccount] = useState<string | null>(null);
   const [openDilog, setOpenDilog] = useState(false);
-  const [providerArray, setProviderArray] = useState<any[]>([]);
-  const [searchInput,setSearchInput] = useState("");
-  const [TradeClicked , setTradeClicked] = useState<any[]>([]);
+  const [providerArray, setProviderArray] = useState<Array<any>>([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [TradeClicked, setTradeClicked] = useState<any>();
+  const [userBalance, setUserBalance] = useState<string | null>(null);
+
 
   useEffect(() => {
     const fetchCoinData = async () => {
@@ -118,9 +119,36 @@ export default function Home() {
     fetchCoinData();
   }, []);
 
+  const getAlchemyConfig = (blockchainName) => {
+    const apiKeyMapping = {
+      'ethereum': 'R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU',
+      'polygon': '6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP'
+    };
+    const networkMapping = {
+      'ethereum': Network.ETH_MAINNET,
+      'polygon': Network.MATIC_MAINNET
+    };
+    return {
+      apiKey: apiKeyMapping[blockchainName],
+      network: networkMapping[blockchainName]
+    };
+  };
+
+  const fetchTokenBalance = async (address, tokenAddress, blockchain) => {
+    const alchemyConfig = getAlchemyConfig(blockchain);
+    const alchemy = new Alchemy(alchemyConfig);
+    try {
+      const data = await alchemy.core.getTokenBalances(address, [tokenAddress]);
+      console.log("Token balance for Address", data);
+      return data.tokenBalances[0].tokenBalance;
+    } catch (error) {
+      console.error("Error fetching token balance:", error);
+    }
+  };
+  
+
   async function fetchTrades() {
     try {
-      debugger;
       console.log("fromData in fetchTrades", typeof fromData.token);
       console.log("toData in fetchTrades", typeof toData.token);
       const blockchainFrom = fromData.token.toUpperCase() as MyBlockchainName;
@@ -134,27 +162,18 @@ export default function Home() {
         toData.tokenAddress,
         fromData.amount
       );
+
+      console.log("Result = ", result);
       setProviderArray(result);
     } catch (error) {
       console.error("Error fetching trades:", error);
     }
   }
 
-  const DisplayTokenDetails = async (searchedAddress: string) => {
-    try {
-        console.log("searchedAddress", searchedAddress);
-        const tokendata = await TOKEN.createToken({
-            blockchain: BLOCKCHAIN_NAME.ETHEREUM,
-            address: '0xdac17f958d2ee523a2206206994597c13d831ec7'
-        });
-        console.log(tokendata);
-    } catch (error) {
-        console.error("An error occurred while fetching token details:", error);
-    }
-}
 
   const calculateToAmount = async () => {
     try {
+      console.log("calculate amount called");
       let USDPriceFromToken: any = fromData.usdprice;
       let USDPriceToToken: any = toData.usdprice;
 
@@ -195,7 +214,6 @@ export default function Home() {
   const validNumber = new RegExp(/^\d*\.?\d*$/);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    debugger;
     const amount = e.target.value;
 
     if (validNumber.test(amount)) {
@@ -206,17 +224,17 @@ export default function Home() {
   };
 
   const configureWallet = async () => {
-  
+
     if (isConnected && address) {
-      const walletProvider : any = {
+      const walletProvider: any = {
         [CHAIN_TYPE.EVM]: {
           address,
           core: window.ethereum
         }
       };
-  
+
       try {
-        const updatedConfiguration :any = { ...configuration, walletProvider };
+        const updatedConfiguration: any = { ...configuration, walletProvider };
         const sdk = await SDK.createSDK(updatedConfiguration);
         sdk.updateWalletProvider(walletProvider);
         console.log("SDK configuration successful");
@@ -225,38 +243,54 @@ export default function Home() {
       }
     }
   };
-  
 
   useEffect(() => {
-  configureWallet();
-}, [address, isConnected]);
-  
-useEffect(() => {
-  console.log("USeEffect rendered");
-  // debugger;
-  console.log("Trade clicked",TradeClicked)
-  if (TradeClicked) {
-    console.log("swap is performed useeffect")
-   
-  // console.log(swapData);
-    performSwap(TradeClicked);
-  }
-}, [TradeClicked]);
+    configureWallet();
+  }, [address, isConnected]);
 
-const performSwap = async (bestTrade : any) => {
-  console.log("Swap is performed")
-  console.log("best Trade",bestTrade);
-  debugger;
-  try {
-    const receipt = await bestTrade.swap({
-      onConfirm: (hash : any) => console.log('Transaction Hash:', hash),
-      onError: (error : any) => console.error('Swap Error:', error)
-    });
-    console.log('Trade executed:', receipt);
-  } catch (error) {
-    console.error('Error executing trade:', error);
-  }
-};
+
+  useEffect(() => {
+    if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
+      fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
+        .then(balance => {
+          if (parseFloat(balance) >= fromData.amount) {
+            performSwap(TradeClicked);
+          } else {
+            alert(`Insufficient Balance for Transaction`);
+            console.log("Insufficient Balance");
+          }
+        })
+        .catch(error => console.error(error));
+    }
+  }, [TradeClicked, fromData]);
+  
+  
+
+  const performSwap = async (bestTrade: any) => {
+
+    console.log(bestTrade.trade);
+    try {
+
+      const trade = bestTrade.trade as CrossChainTrade | OnChainTrade ;
+
+      const receipt = trade.swap(
+        {
+          onConfirm: (hash: any) => console.log('Transaction Hash:', hash),
+        }).then(hash => {
+          console.log("swap function called success");
+          alert(`Transaction was successfull ${hash}`);
+          console.log(hash);
+        }).catch(err => {
+          alert("SWAP TRANSACTION FAILED");
+          console.log("swap function called failed");
+          console.error(err);
+        });
+      console.log('Trade executed:', receipt);
+    } catch (error) {
+      console.error('Error executing trade:', error);
+    }
+  };
+
 
   const handleTokenSelection1 = (tokenName: string, tokenImage: string) => {
     const selectedToken: Token = {
@@ -465,7 +499,7 @@ const performSwap = async (bestTrade : any) => {
                       handleNetworkRender={handleNetworkRender}
                       handleTokenSelection={handleTokenSelection1}
                       type={'from'}
-                      DisplayTokenDetails ={DisplayTokenDetails}
+                      DisplayTokenDetails={DisplayTokenDetails}
                     />
                   )}
                   <input
@@ -622,10 +656,10 @@ const performSwap = async (bestTrade : any) => {
                   zIndex: 0,
                 }}
               >
-                  <CheckBalance
-                    tokenAddress={fromData.tokenAddress}
-                    fromAmount={fromData.amount}
-                  />
+                <CheckBalance
+                  tokenAddress={fromData.tokenAddress}
+                  fromAmount={fromData.amount}
+                />
               </div>
             </div>
           </div>
