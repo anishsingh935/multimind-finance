@@ -16,13 +16,11 @@ function DialogModal({
   value,
   handleNetworkset,
   type,
-  DisplayTokenDetails
 }:{coinData:any,
   handleNetworkRender:Function,
   handleTokenSelection:Function,
   value:any,
   handleNetworkset:Function,
-  DisplayTokenDetails:Function
   type:any})
   {
     const [searchInput,setSearchInput] = useState("");

@@ -95,12 +95,12 @@ export default function MobileHome() {
 
   const getAlchemyConfig = (blockchainName) => {
     const apiKeyMapping = {
-      'ethereum': 'R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU',
-      'polygon': '6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP'
+      'Ethereum': 'R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU',
+      'Polygon': '6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP'
     };
     const networkMapping = {
-      'ethereum': Network.ETH_MAINNET,
-      'polygon': Network.MATIC_MAINNET
+      'Ethereum': Network.ETH_MAINNET,
+      'Polygon': Network.MATIC_MAINNET
     };
     return {
       apiKey: apiKeyMapping[blockchainName],
@@ -443,7 +443,7 @@ export default function MobileHome() {
       >
         {providerArray?.map((data, index) => (
           <div key={index}>
-            <RouteCard data={data} index={index} />
+            <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
         </div>
         ))}
       </div>}

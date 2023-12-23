@@ -121,12 +121,12 @@ export default function Home() {
 
   const getAlchemyConfig = (blockchainName) => {
     const apiKeyMapping = {
-      'ethereum': 'R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU',
-      'polygon': '6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP'
+      'Ethereum': 'R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU',
+      'Polygon': '6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP'
     };
     const networkMapping = {
-      'ethereum': Network.ETH_MAINNET,
-      'polygon': Network.MATIC_MAINNET
+      'Ethereum': Network.ETH_MAINNET,
+      'Polygon': Network.MATIC_MAINNET
     };
     return {
       apiKey: apiKeyMapping[blockchainName],
@@ -135,7 +135,9 @@ export default function Home() {
   };
 
   const fetchTokenBalance = async (address, tokenAddress, blockchain) => {
+    console.log(blockchain);
     const alchemyConfig = getAlchemyConfig(blockchain);
+    console.log(alchemyConfig);
     const alchemy = new Alchemy(alchemyConfig);
     try {
       const data = await alchemy.core.getTokenBalances(address, [tokenAddress]);
@@ -499,7 +501,6 @@ export default function Home() {
                       handleNetworkRender={handleNetworkRender}
                       handleTokenSelection={handleTokenSelection1}
                       type={'from'}
-                      DisplayTokenDetails={DisplayTokenDetails}
                     />
                   )}
                   <input

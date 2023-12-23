@@ -19,14 +19,14 @@ async function calculateCrossChainTrades(fromBlockchain: MyBlockchainName, fromT
                 fromAmount,
                 toTokenAddress
             );
-
-            trades.forEach(trade => {
-                if (trade.error) {
-                    console.error(`error: ${trade.error}`);
-                } else {
+            
+            trades.forEach(trade  => {
+                console.log( trade.feeInfo?.rubicProxy?.fixedFee?.amount?.toFormat(3));
+                console.log(trade.to?.symbol);
+                console.log(trade.to?.tokenAmount?.toFormat(3));
                     const providerObj: any = {
                         dexName: trade.type, // Assuming trade type is accessible
-                        protocolFee: trade.feeInfo?.fixedFee?.amount?.toFormat(3),
+                        protocolFee: trade.feeInfo?.rubicProxy?.fixedFee?.amount?.toFormat(3),
                         tokenSymbol: trade.to?.symbol,
                         tokenAmount: trade.to?.tokenAmount?.toFormat(3),
                         estimatedTime: "Unavailable",
@@ -34,10 +34,9 @@ async function calculateCrossChainTrades(fromBlockchain: MyBlockchainName, fromT
                         trade: trade
                     };
                     providerArray.push(providerObj);
-                }
-            });
-        } else {
-            // Cross-chain trade
+                });
+            }
+            else {
             const wrappedTrades = await sdk.crossChainManager.calculateTrade(
                 { blockchain: BLOCKCHAIN_NAME[fromBlockchain], address: fromTokenAddress },
                 fromAmount,
@@ -46,7 +45,7 @@ async function calculateCrossChainTrades(fromBlockchain: MyBlockchainName, fromT
 
             wrappedTrades.forEach(wrappedTrade => {
                 if (wrappedTrade.error) {
-                    console.error(`error: ${wrappedTrade.error}`);
+                    console.log(`error: ${wrappedTrade.error}`);
                 } else {
                     const providerObj: any = {
                         dexName: wrappedTrade.tradeType,
