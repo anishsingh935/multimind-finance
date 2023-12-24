@@ -138,7 +138,7 @@ export default function MobileHome() {
         );
         const solanaobj = {
           id: 1399811149,
-          name: "solana",
+          name: "Solana",
           logoURI:
             "https://app.rubic.exchange/assets/images/icons/coins/solana.svg",
         };
