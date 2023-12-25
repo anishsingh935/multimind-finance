@@ -125,6 +125,20 @@
   margin: 0;
 }
 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* Adjust the alpha value for the desired level of transparency */
+  backdrop-filter: blur(10px); /* Adjust the blur value as needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
 .walletClass div button {
   background-color: var(
     --GR,

@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState,CSSProperties  } from "react";
 import axios from "axios";
 
 import "@rainbow-me/rainbowkit/styles.css";
@@ -10,19 +10,8 @@ import { ethers } from "ethers";
 import { TbRefresh } from "react-icons/tb";
 import { AiOutlineSwap } from "react-icons/ai";
 import CircleImage from "@/app/CircleImage.svg";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { CheckBalance } from "./Ai-Routing/checkbalance";
 import calculateTrades from "./Ai-Routing/Trades";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Skeleton } from "@/components/ui/skeleton"
 import { useAccount } from "wagmi";
 import RouteCard from "@/components/route-card";
 import MobileHome from "./mobileMUltiMind";
@@ -30,6 +19,8 @@ import DialogModal from "@/components/dialogModal";
 import configuration from './rubic';
 import { Alchemy, Network } from "alchemy-sdk";
 import SkeletonSection from "@/components/skeleton-section";
+import ScaleLoader from "react-spinners/ScaleLoader";
+
 type MyBlockchainName = "ETHEREUM" | "POLYGON" | "AVALANCHE" | "SOLANA";
 
 declare global {
@@ -95,6 +86,7 @@ export default function Home() {
   const [TradeClicked, setTradeClicked] = useState<any>();
   const [userBalance, setUserBalance] = useState<string | null>(null);
   const [showAirouting,setShowAirouting]=useState(false);
+  const [loading,setLoading]=useState(false);
 
 
   useEffect(() => {
@@ -260,6 +252,7 @@ export default function Home() {
 
   useEffect(() => {
     if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
+        setLoading(true);
       fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
         .then((balance:any) => {
           if (parseFloat(balance) >= fromData.amount) {
@@ -268,7 +261,9 @@ export default function Home() {
             alert(`Insufficient Balance for Transaction`);
             console.log("Insufficient Balance");
           }
+          setLoading(false);
         })
+
         .catch(error => console.error(error));
     }
   }, [TradeClicked, fromData]);
@@ -343,6 +338,14 @@ export default function Home() {
       tokenSymbol: networkSymbol,
       usdprice: networkValue.usdPrice,
     });
+  };
+  const override: CSSProperties = {
+    display: "flex",
+    justifyItems:"center",
+    alignItems:"center",
+    margin: "0 auto",
+    borderColor: "white",
+    marginTop:"20vh"
   };
   return (
     <>
@@ -729,6 +732,16 @@ export default function Home() {
       <div className="mobileView mobbgImg">
         <MobileHome />
       </div>
+      {loading && <ScaleLoader className="overlay" color="#36d7b7" style={{
+        position:"absolute",
+        top:"0",
+        width:"100vw",
+        height:"100vh",
+        display:"flex",
+        alignItems:"center",
+        justifyContent:"center",
+        zIndex:"999"
+      }} />}
     </>
   );
 }
