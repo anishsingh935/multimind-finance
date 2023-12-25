@@ -98,6 +98,7 @@ export default function MobileHome() {
   const [TradeClicked, setTradeClicked] = useState<any>();
   const [userBalance, setUserBalance] = useState<string | null>(null);
   const [showAirouting,setShowAirouting]=useState(false);
+  const [loading,setLoading] = useState(false);
 
   const getAlchemyConfig = (blockchainName:any) => {
     const apiKeyMapping:any = {
@@ -302,7 +303,6 @@ export default function MobileHome() {
           //   alert(`Insufficient Balance for Transaction`);
           //   console.log("Insufficient Balance");
           // }
-          setLoading(false);
         }
       },[TradeClicked, fromData])
   
@@ -322,10 +322,12 @@ export default function MobileHome() {
           console.log("swap function called success");
           alert(`Transaction was successfull ${hash}`);
           console.log(hash);
+          setLoading(true);
         }).catch(err => {
           alert("SWAP TRANSACTION FAILED");
           console.log("swap function called failed");
           console.error(err);
+          setLoading(true);
         });
       console.log('Trade executed:', receipt);
     } catch (error) {

@@ -274,7 +274,6 @@ export default function Home() {
         setLoading(true);
         console.log("Performing Swap");
             performSwap(TradeClicked);
-          setLoading(false);
         }
       },[TradeClicked, fromData])
 
@@ -296,11 +295,12 @@ export default function Home() {
           console.log("swap function called success");
           alert(`Transaction was successfull ${hash}`);
           console.log(hash);
+          setLoading(false);
         }).catch(err => {
-          alert(err);
           alert("SWAP TRANSACTION FAILED");
           console.log("swap function called failed");
           console.error(err);
+          setLoading(false);
         });
       console.log('Trade executed:', receipt);
     } catch (error) {
