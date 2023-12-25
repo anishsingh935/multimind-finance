@@ -274,10 +274,6 @@ export default function Home() {
         setLoading(true);
         console.log("Performing Swap");
             performSwap(TradeClicked);
-          // } else {
-          //   alert(`Insufficient Balance for Transaction`);
-          //   console.log("Insufficient Balance");
-          // }
           setLoading(false);
         }
       },[TradeClicked, fromData])
@@ -301,6 +297,7 @@ export default function Home() {
           alert(`Transaction was successfull ${hash}`);
           console.log(hash);
         }).catch(err => {
+          alert(err);
           alert("SWAP TRANSACTION FAILED");
           console.log("swap function called failed");
           console.error(err);
