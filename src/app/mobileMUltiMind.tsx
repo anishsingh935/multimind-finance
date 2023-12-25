@@ -3,32 +3,33 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-import '@rainbow-me/rainbowkit/styles.css';
-import { CheckBalance } from "./Ai-Routing/checkbalance";
+import "@rainbow-me/rainbowkit/styles.css";
 import { Button } from "@/components/ui/button";
-import { ethers } from 'ethers';
+import { BLOCKCHAIN_NAME, CrossChainTrade,OnChainTrade, SDK, WalletProvider, CHAIN_TYPE, Configuration } from "rubic-sdk";
+import { ethers } from "ethers";
 import { TbRefresh } from "react-icons/tb";
 import { AiOutlineSwap } from "react-icons/ai";
-import CircleImage from '@/app/CircleImage.svg'
+import CircleImage from "@/app/CircleImage.svg";
 import {
   DropdownMenu,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import calculateTrades from './Ai-Routing/Trades' 
+import { CheckBalance } from "./Ai-Routing/checkbalance";
+import calculateTrades from "./Ai-Routing/Trades";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { BLOCKCHAIN_NAME, CrossChainTrade,OnChainTrade, SDK, WalletProvider, CHAIN_TYPE, Configuration } from "rubic-sdk";
-import { Input } from "@/components/ui/input";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Skeleton } from "@/components/ui/skeleton"
 import { useAccount } from "wagmi";
 import RouteCard from "@/components/route-card";
 import DialogModal from "@/components/dialogModal";
-import { Alchemy ,Network } from "alchemy-sdk";
 import configuration from './rubic';
+import { Alchemy, Network } from "alchemy-sdk";
+import SkeletonSection from "@/components/skeleton-section";
+type MyBlockchainName = "ETHEREUM" | "POLYGON" | "AVALANCHE" | "SOLANA";
 
 
 declare global {
@@ -62,15 +63,13 @@ interface apiKey{
 
 export default function MobileHome() {
   
-  const [isBalance,setIsBalance] = useState(false);
-
   const [fromData, setFromData] = useState({
     token: "",
     network: "",
     amount: 0,
     tokenAddress: "",
     tokenSymbol: "",
-    usdprice:""
+    usdprice: "",
   });
 
   const [toData, setToData] = useState({
@@ -79,8 +78,9 @@ export default function MobileHome() {
     amount: 0,
     tokenAddress: "",
     tokenSymbol: "",
-    usdprice : ""
+    usdprice: "",
   });
+  const numberOfSkeletons=4;
   const { isConnected, address } = useAccount();
   const [showAccordion1, setShowAccordion1] = useState(false);
   const [showAccordion2, setShowAccordion2] = useState(false);
@@ -89,12 +89,15 @@ export default function MobileHome() {
   const [selectedToken2, setSelectedToken2] = useState<Token | null>(null);
   const [value, setValue] = useState<any[]>([]);
   const [walletClicked, setWalletClicked] = useState(false);
-  const [convertedAmount, setConvertedAmount] = useState(0);
-  const [providerArray, setProviderArray] = useState<any[]>([]); 
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
+  const [provider, setProvider] =
+    useState<ethers.providers.Web3Provider | null>(null);
   const [account, setAccount] = useState<string | null>(null);
+  const [openDilog, setOpenDilog] = useState(false);
+  const [providerArray, setProviderArray] = useState<Array<any>>([]);
+  const [searchInput, setSearchInput] = useState("");
   const [TradeClicked, setTradeClicked] = useState<any>();
-  type MyBlockchainName = 'ETHEREUM' | 'POLYGON'  | 'AVALANCHE' | 'SOLANA';
+  const [userBalance, setUserBalance] = useState<string | null>(null);
+  const [showAirouting,setShowAirouting]=useState(false);
 
   const getAlchemyConfig = (blockchainName:any) => {
     const apiKeyMapping:any = {
@@ -153,19 +156,33 @@ export default function MobileHome() {
   }, []);
 
   async function fetchTrades() {
+
     try {
-      console.log("fromData in fetchTrades",typeof fromData.token)
-      console.log("toData in fetchTrades",typeof toData.token)
-      const blockchainFrom = fromData.token.toUpperCase() as MyBlockchainName;
-      const blockchainTo = toData.token.toUpperCase() as MyBlockchainName;
-      console.log(blockchainFrom)
-      console.log(blockchainTo)
-      const result = await calculateTrades(blockchainFrom, fromData.tokenAddress, blockchainTo, toData.tokenAddress, fromData.amount);
-      setProviderArray(result)
+      if(fromData?.token && toData?.token && fromData?.amount){
+        console.log("fromData in fetchTrades", typeof fromData.token);
+        console.log("toData in fetchTrades", typeof toData.token);
+        const blockchainFrom = fromData.token.toUpperCase() as MyBlockchainName;
+        const blockchainTo = toData.token.toUpperCase() as MyBlockchainName;
+        console.log(blockchainFrom);
+        console.log(blockchainTo);
+        setShowAirouting(true);
+        const result = await calculateTrades(
+          blockchainFrom,
+          fromData.tokenAddress,
+          blockchainTo,
+          toData.tokenAddress,
+          fromData.amount
+        );
+  
+        console.log("Result = ", result);
+        setProviderArray(result);
+      }
+      
     } catch (error) {
-      console.error('Error fetching trades:', error);
+      console.error("Error fetching trades:", error);
     }
   }
+
   
 
 
@@ -215,7 +232,7 @@ export default function MobileHome() {
 
   const calculateToAmount = async () => {
     try {
-      debugger
+      // debugger
       let USDPriceFromToken : any = fromData.usdprice;
       let USDPriceToToken : any = toData.usdprice;     
       const amountInUSD : any =fromData.amount*(USDPriceFromToken);
@@ -444,7 +461,52 @@ export default function MobileHome() {
               </div>
         </div>
       </div>
-      { providerArray?.length > 0 && <div style={{ fontSize: "20px",  width: "95%",fontWeight: "600",borderTopLeftRadius: "20px",borderTopRightRadius: "20px", padding: "15px 33px",marginTop:"29vh" }} className="w-full flex px-5 justify-between"><h1>AI Routing</h1> <TbRefresh /></div>}
+      { showAirouting && (
+            <div
+            style={{
+              fontSize: "20px",
+              width: "95%",
+              fontWeight: "600",
+              borderTopLeftRadius: "20px",
+              borderTopRightRadius: "20px",
+              padding: "15px 33px",
+              marginTop: "29vh",
+            }}
+            className="w-full flex px-5 justify-between"
+          >
+              <h1>AI Routing</h1> <TbRefresh />
+            </div>
+          )}
+          {showAirouting && (
+             <div
+             style={{
+               width: "95%",
+               overflowY: "scroll",
+               padding: "15px",
+               display: "flex",
+               flexDirection: "column",
+               paddingTop: "10px",
+               gap: "10px",
+             }}
+           >
+              {providerArray.length>0 ? providerArray?.map((data, index) => (
+                <div key={index}>
+                  <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
+                </div>
+              )): (
+                <>
+                {[...Array(numberOfSkeletons)].map((_, index) => (
+                  <div key={index}>
+                    <SkeletonSection index={index} />
+                  </div>
+                ))}
+                </>
+              )
+            }
+
+            </div>
+          )}
+      {/* { providerArray?.length > 0 && <div style={{ fontSize: "20px",  width: "95%",fontWeight: "600",borderTopLeftRadius: "20px",borderTopRightRadius: "20px", padding: "15px 33px",marginTop:"29vh" }} className="w-full flex px-5 justify-between"><h1>AI Routing</h1> <TbRefresh /></div>}
       {providerArray?.length > 0 && <div
         style={{ width: "95%", overflowY:"scroll",padding: "15px", display: "flex", flexDirection: "column",  paddingTop:"10px", gap:"10px" }}
       >
@@ -453,7 +515,7 @@ export default function MobileHome() {
             <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
         </div>
         ))}
-      </div>}
+      </div>} */}
     </div>
   );
 }
