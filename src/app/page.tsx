@@ -22,12 +22,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Skeleton } from "@/components/ui/skeleton"
 import { useAccount } from "wagmi";
 import RouteCard from "@/components/route-card";
 import MobileHome from "./mobileMUltiMind";
 import DialogModal from "@/components/dialogModal";
 import configuration from './rubic';
 import { Alchemy, Network } from "alchemy-sdk";
+import SkeletonSection from "@/components/skeleton-section";
 type MyBlockchainName = "ETHEREUM" | "POLYGON" | "AVALANCHE" | "SOLANA";
 
 declare global {
@@ -75,6 +77,7 @@ export default function Home() {
     tokenSymbol: "",
     usdprice: "",
   });
+  const numberOfSkeletons=4;
   const { isConnected, address } = useAccount();
   const [showAccordion1, setShowAccordion1] = useState(false);
   const [showAccordion2, setShowAccordion2] = useState(false);
@@ -91,6 +94,7 @@ export default function Home() {
   const [searchInput, setSearchInput] = useState("");
   const [TradeClicked, setTradeClicked] = useState<any>();
   const [userBalance, setUserBalance] = useState<string | null>(null);
+  const [showAirouting,setShowAirouting]=useState(false);
 
 
   useEffect(() => {
@@ -148,23 +152,28 @@ export default function Home() {
   
 
   async function fetchTrades() {
-    try {
-      console.log("fromData in fetchTrades", typeof fromData.token);
-      console.log("toData in fetchTrades", typeof toData.token);
-      const blockchainFrom = fromData.token.toUpperCase() as MyBlockchainName;
-      const blockchainTo = toData.token.toUpperCase() as MyBlockchainName;
-      console.log(blockchainFrom);
-      console.log(blockchainTo);
-      const result = await calculateTrades(
-        blockchainFrom,
-        fromData.tokenAddress,
-        blockchainTo,
-        toData.tokenAddress,
-        fromData.amount
-      );
 
-      console.log("Result = ", result);
-      setProviderArray(result);
+    try {
+      if(fromData?.token && toData?.token && fromData?.amount){
+        console.log("fromData in fetchTrades", typeof fromData.token);
+        console.log("toData in fetchTrades", typeof toData.token);
+        const blockchainFrom = fromData.token.toUpperCase() as MyBlockchainName;
+        const blockchainTo = toData.token.toUpperCase() as MyBlockchainName;
+        console.log(blockchainFrom);
+        console.log(blockchainTo);
+        setShowAirouting(true);
+        const result = await calculateTrades(
+          blockchainFrom,
+          fromData.tokenAddress,
+          blockchainTo,
+          toData.tokenAddress,
+          fromData.amount
+        );
+  
+        console.log("Result = ", result);
+        setProviderArray(result);
+      }
+      
     } catch (error) {
       console.error("Error fetching trades:", error);
     }
@@ -665,7 +674,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          {providerArray?.length > 0 && (
+          { showAirouting && (
             <div
               style={{
                 fontSize: "20px",
@@ -683,7 +692,7 @@ export default function Home() {
               <h1>AI Routing</h1> <TbRefresh />
             </div>
           )}
-          {providerArray?.length > 0 && (
+          {showAirouting && (
             <div
               style={{
                 width: "50%",
@@ -698,11 +707,21 @@ export default function Home() {
                 zIndex: "10",
               }}
             >
-              {providerArray?.map((data, index) => (
+              {providerArray.length>0 ? providerArray?.map((data, index) => (
                 <div key={index}>
                   <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
                 </div>
-              ))}
+              )): (
+                <>
+                {[...Array(numberOfSkeletons)].map((_, index) => (
+                  <div key={index}>
+                    <SkeletonSection index={index} />
+                  </div>
+                ))}
+                </>
+              )
+            }
+
             </div>
           )}
         </div>
