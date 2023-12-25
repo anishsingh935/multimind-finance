@@ -94,6 +94,7 @@ export default function MobileHome() {
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
   const [account, setAccount] = useState<string | null>(null);
   const [TradeClicked, setTradeClicked] = useState<any>();
+  const [loading,setLoading]=useState(false);
   type MyBlockchainName = 'ETHEREUM' | 'POLYGON'  | 'AVALANCHE' | 'SOLANA';
 
   const getAlchemyConfig = (blockchainName:any) => {
@@ -261,20 +262,33 @@ export default function MobileHome() {
   }, [address, isConnected]);
 
 
+  // useEffect(() => {
+  //   if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
+  //     fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
+  //       .then((balance:any) => {
+  //         if (parseFloat(balance) >= fromData.amount) {
+  //           performSwap(TradeClicked);
+  //         } else {
+  //           alert(`Insufficient Balance for Transaction`);
+  //           console.log("Insufficient Balance");
+  //         }
+  //       })
+  //       .catch(error => console.error(error));
+  //   }
+  // }, [TradeClicked, fromData]);
+
   useEffect(() => {
     if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
-      fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
-        .then((balance:any) => {
-          if (parseFloat(balance) >= fromData.amount) {
+        setLoading(true);
+        console.log("Performing Swap");
             performSwap(TradeClicked);
-          } else {
-            alert(`Insufficient Balance for Transaction`);
-            console.log("Insufficient Balance");
-          }
-        })
-        .catch(error => console.error(error));
-    }
-  }, [TradeClicked, fromData]);
+          // } else {
+          //   alert(`Insufficient Balance for Transaction`);
+          //   console.log("Insufficient Balance");
+          // }
+          setLoading(false);
+        }
+      },[TradeClicked, fromData])
   
   
 
