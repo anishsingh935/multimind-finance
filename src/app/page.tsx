@@ -5,11 +5,14 @@ import axios from "axios";
 
 import "@rainbow-me/rainbowkit/styles.css";
 import { Button } from "@/components/ui/button";
-import { BLOCKCHAIN_NAME, CrossChainTrade,OnChainTrade, SDK, WalletProvider, CHAIN_TYPE, Configuration } from "rubic-sdk";
+import { BLOCKCHAIN_NAME, CrossChainTrade, OnChainTrade, SDK, WalletProvider, CHAIN_TYPE, Configuration } from "rubic-sdk";
 import { ethers } from "ethers";
 import { TbRefresh } from "react-icons/tb";
 import { AiOutlineSwap } from "react-icons/ai";
 import CircleImage from "@/app/CircleImage.svg";
+import { ToastContainer, toast } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -28,6 +31,7 @@ import MobileHome from "./mobileMUltiMind";
 import DialogModal from "@/components/dialogModal";
 import configuration from './rubic';
 import { Alchemy, Network } from "alchemy-sdk";
+import SkeletonSection from "@/components/skeleton-section";
 type MyBlockchainName = "ETHEREUM" | "POLYGON" | "AVALANCHE" | "SOLANA";
 
 declare global {
@@ -91,7 +95,8 @@ export default function Home() {
   const [searchInput, setSearchInput] = useState("");
   const [TradeClicked, setTradeClicked] = useState<any>();
   const [userBalance, setUserBalance] = useState<string | null>(null);
-
+  const [skeleton, setSkeleton] = useState(false);
+  const numberOfSkeletons = 4;
 
   useEffect(() => {
     const fetchCoinData = async () => {
@@ -119,12 +124,12 @@ export default function Home() {
     fetchCoinData();
   }, []);
 
-  const getAlchemyConfig = (blockchainName:any) => {
-    const apiKeyMapping:any = {
+  const getAlchemyConfig = (blockchainName: any) => {
+    const apiKeyMapping: any = {
       'Ethereum': 'R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU',
       'Polygon': '6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP'
     };
-    const networkMapping:any = {
+    const networkMapping: any = {
       'Ethereum': Network.ETH_MAINNET,
       'Polygon': Network.MATIC_MAINNET
     };
@@ -134,7 +139,7 @@ export default function Home() {
     };
   };
 
-  const fetchTokenBalance = async (address:any, tokenAddress:any, blockchain:any) => {
+  const fetchTokenBalance = async (address: any, tokenAddress: any, blockchain: any) => {
     const alchemyConfig = getAlchemyConfig(blockchain);
     const alchemy = new Alchemy(alchemyConfig);
     try {
@@ -145,7 +150,7 @@ export default function Home() {
       console.error("Error fetching token balance:", error);
     }
   };
-  
+
 
   async function fetchTrades() {
     try {
@@ -155,6 +160,7 @@ export default function Home() {
       const blockchainTo = toData.token.toUpperCase() as MyBlockchainName;
       console.log(blockchainFrom);
       console.log(blockchainTo);
+      setSkeleton(true);
       const result = await calculateTrades(
         blockchainFrom,
         fromData.tokenAddress,
@@ -165,6 +171,7 @@ export default function Home() {
 
       console.log("Result = ", result);
       setProviderArray(result);
+      setSkeleton(false);
     } catch (error) {
       console.error("Error fetching trades:", error);
     }
@@ -252,26 +259,35 @@ export default function Home() {
   useEffect(() => {
     if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
       fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
-        .then((balance:any) => {
+        .then((balance: any) => {
           if (parseFloat(balance) >= fromData.amount) {
             performSwap(TradeClicked);
           } else {
-            alert(`Insufficient Balance for Transaction`);
+            toast.error(`Insufficient Balance for Transaction`, {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+            });
             console.log("Insufficient Balance");
           }
         })
         .catch(error => console.error(error));
     }
   }, [TradeClicked, fromData]);
-  
-  
+
+
 
   const performSwap = async (bestTrade: any) => {
 
     console.log(bestTrade.trade);
     try {
 
-      const trade = bestTrade.trade as CrossChainTrade | OnChainTrade ;
+      const trade = bestTrade.trade as CrossChainTrade | OnChainTrade;
 
       const receipt = trade.swap(
         {
@@ -665,48 +681,99 @@ export default function Home() {
               </div>
             </div>
           </div>
-          {providerArray?.length > 0 && (
-            <div
-              style={{
-                fontSize: "20px",
-                width: "50%",
-                fontWeight: "600",
-                borderTopLeftRadius: "20px",
-                borderTopRightRadius: "20px",
-                background: "#18181b",
-                padding: "15px 33px",
-                marginTop: "26px",
-                zIndex: "10",
-              }}
-              className="w-full flex px-5 justify-between"
-            >
-              <h1>AI Routing</h1> <TbRefresh />
+         {
+  skeleton ? (
+    <>
+      <div
+        style={{
+          fontSize: "20px",
+          width: "50%",
+          fontWeight: "600",
+          borderTopLeftRadius: "20px",
+          borderTopRightRadius: "20px",
+          background: "#18181b",
+          padding: "15px 33px",
+          marginTop: "26px",
+          zIndex: providerArray && providerArray.length !== 0 ? "10" : "5",
+        }}
+        className="w-full flex px-5 justify-between"
+      >
+        <h1>AI Routing</h1>
+        <TbRefresh />
+      </div>
+      <div
+        style={{
+          width: "50%",
+          overflowX: "auto",
+          height: "200px",
+          background: "#18181b",
+          padding: "15px",
+          display: "flex",
+          flexDirection: "row",
+          paddingTop: "10px",
+          gap: "10px",
+          zIndex: providerArray && providerArray.length !== 0 ? "10" : "5",
+        }}
+      >
+        {[...Array(numberOfSkeletons)].map((_, index) => (
+          <div key={index}>
+            <SkeletonSection index={index} />
+          </div>
+        ))}
+      </div>
+    </>
+  ) : (
+    <div
+      style={{
+        fontSize: "20px",
+        width: "50%",
+        fontWeight: "600",
+        borderTopLeftRadius: "20px",
+        borderTopRightRadius: "20px",
+        background: "#18181b",
+        padding: "15px 33px",
+        marginTop: "26px",
+        zIndex: providerArray && providerArray.length !== 0 ? "10" : "5",
+      }}
+      className="w-full flex px-5 justify-between"
+    >
+      <h1>AI Routing</h1>
+      <TbRefresh />
+      <div
+        style={{
+          width: "50%",
+          overflowX: "auto",
+          height: "200px",
+          background: "#18181b",
+          padding: "15px",
+          display: "flex",
+          flexDirection: "row",
+          paddingTop: "10px",
+          gap: "10px",
+          zIndex: providerArray && providerArray.length !== 0 ? "10" : "5",
+        }}
+      >
+        {providerArray && providerArray.length !== 0 ? (
+          providerArray.map((data, index) => (
+            <div key={index}>
+              <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
             </div>
-          )}
-          {providerArray?.length > 0 && (
-            <div
-              style={{
-                width: "50%",
-                overflowX: "scroll",
-                height: "200px",
-                background: "#18181b",
-                padding: "15px",
-                display: "flex",
-                flexDirection: "row",
-                paddingTop: "10px",
-                gap: "10px",
-                zIndex: "10",
-              }}
-            >
-              {providerArray?.map((data, index) => (
-                <div key={index}>
-                  <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
-                </div>
-              ))}
+          ))
+        ) : (
+          [...Array(numberOfSkeletons)].map((_, index) => (
+            <div key={index}>
+              <SkeletonSection index={index} />
             </div>
-          )}
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+
         </div>
       </div>
+
       <div className="mobileView mobbgImg">
         <MobileHome />
       </div>
