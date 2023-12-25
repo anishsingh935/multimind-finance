@@ -19,7 +19,7 @@ import DialogModal from "@/components/dialogModal";
 import configuration from './rubic';
 import { Alchemy, Network } from "alchemy-sdk";
 import SkeletonSection from "@/components/skeleton-section";
-import ClipLoader from "react-spinners/DotLoader";
+import DotLoader from "react-spinners/DotLoader";
 
 type MyBlockchainName = "ETHEREUM" | "POLYGON" | "AVALANCHE" | "SOLANA";
 
