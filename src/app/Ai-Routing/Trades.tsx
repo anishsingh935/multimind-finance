@@ -63,9 +63,9 @@ async function calculateCrossChainTrades(fromBlockchain: MyBlockchainName, fromT
                 fromAmount,
                 { blockchain: BLOCKCHAIN_NAME[toBlockchain], address: toTokenAddress }
             );
-            debugger;
 
             wrappedTrades.forEach(wrappedTrade => {
+                console.log("WrappedTrade",wrappedTrade.trade);
                 if (wrappedTrade.error) {
                     console.error(`error: ${wrappedTrade.error}`);
                 } else {

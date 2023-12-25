@@ -235,9 +235,10 @@ export default function Home() {
       };
 
       try {
-        const updatedConfiguration: any = { ...configuration, walletProvider };
+        const updatedConfiguration: Configuration = { ...configuration, walletProvider };
         const sdk = await SDK.createSDK(updatedConfiguration);
         sdk.updateWalletProvider(walletProvider);
+        sdk.updateWalletAddress(CHAIN_TYPE.EVM, address);
         console.log("SDK configuration successful");
       } catch (error) {
         console.error("Error in SDK configuration:", error);
@@ -250,24 +251,37 @@ export default function Home() {
   }, [address, isConnected]);
 
 
+  // useEffect(() => {
+  //   if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
+  //       setLoading(true);
+  //     fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
+  //       .then((balance:any) => {
+  //         if (parseFloat(balance) >= fromData.amount) {
+  //           performSwap(TradeClicked);
+  //         } else {
+  //           alert(`Insufficient Balance for Transaction`);
+  //           console.log("Insufficient Balance");
+  //         }
+  //         setLoading(false);
+  //       })
+
+  //       .catch(error => console.error(error));
+  //   }
+  // }, [TradeClicked, fromData]);
+
   useEffect(() => {
     if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
         setLoading(true);
-      fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
-        .then((balance:any) => {
-          if (parseFloat(balance) >= fromData.amount) {
+        console.log("Performing Swap");
             performSwap(TradeClicked);
-          } else {
-            alert(`Insufficient Balance for Transaction`);
-            console.log("Insufficient Balance");
-          }
+          // } else {
+          //   alert(`Insufficient Balance for Transaction`);
+          //   console.log("Insufficient Balance");
+          // }
           setLoading(false);
-        })
+        }
+      },[TradeClicked, fromData])
 
-        .catch(error => console.error(error));
-    }
-  }, [TradeClicked, fromData]);
-  
   
 
   const performSwap = async (bestTrade: any) => {
@@ -276,6 +290,8 @@ export default function Home() {
     try {
 
       const trade = bestTrade.trade as CrossChainTrade | OnChainTrade ;
+      console.log("Wallet Connected",address);
+      console.log(trade);
 
       const receipt = trade.swap(
         {
