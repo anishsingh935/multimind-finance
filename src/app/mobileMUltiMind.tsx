@@ -94,7 +94,6 @@ export default function MobileHome() {
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null);
   const [account, setAccount] = useState<string | null>(null);
   const [TradeClicked, setTradeClicked] = useState<any>();
-  const [loading,setLoading]=useState(false);
   type MyBlockchainName = 'ETHEREUM' | 'POLYGON'  | 'AVALANCHE' | 'SOLANA';
 
   const getAlchemyConfig = (blockchainName:any) => {
