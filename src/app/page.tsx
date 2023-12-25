@@ -712,8 +712,13 @@ export default function Home() {
                   <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
                 </div>
               )): (
-                    <SkeletonSection index={0} />
-
+                <>
+                {[...Array(numberOfSkeletons)].map((_, index) => (
+                  <div key={index}>
+                    <SkeletonSection index={index} />
+                  </div>
+                ))}
+                </>
               )
             }
 
