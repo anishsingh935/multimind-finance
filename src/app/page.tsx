@@ -19,7 +19,7 @@ import DialogModal from "@/components/dialogModal";
 import configuration from './rubic';
 import { Alchemy, Network } from "alchemy-sdk";
 import SkeletonSection from "@/components/skeleton-section";
-import ClipLoader from "react-spinners/ClipLoader";
+import ClipLoader from "react-spinners/DotLoader";
 
 type MyBlockchainName = "ETHEREUM" | "POLYGON" | "AVALANCHE" | "SOLANA";
 
@@ -350,14 +350,15 @@ export default function Home() {
   return (
     <>
       <div className="webView z-[10]">
-        {loading ? <ClipLoader
+        {loading ? (<DotLoader
         color="white"
         loading={loading}
         cssOverride={override}
         size={150}
         aria-label="Loading Spinner"
         data-testid="loader"
-      /> :
+      />) :
+      (
         <div
           style={{
             display: "flex",
@@ -735,7 +736,7 @@ export default function Home() {
 
             </div>
           )}
-        </div>
+        </div>)
 }
       </div>
       <div className="mobileView mobbgImg">
