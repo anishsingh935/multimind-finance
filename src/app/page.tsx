@@ -273,7 +273,7 @@ export default function Home() {
 
   useEffect(() => {
     configureWallet();
-  }, [address, isConnected, recieverAddress]);
+  }, [address, isConnected]);
 
   useEffect(() => {
     if (
@@ -306,7 +306,6 @@ export default function Home() {
           setLoading(false);
         })
         .catch((err) => {
-          alert("SWAP TRANSACTION FAILED");
           console.log("swap function called failed");
           console.error(err);
           setLoading(false);
@@ -761,15 +760,26 @@ export default function Home() {
               }}
             >
               {providerArray.length > 0 ? (
-                providerArray?.slice(1)?.map((data, index) => (
-                  <div key={index}>
-                    <RouteCard
+                providerArray?.map((data, index) =>
+                data.dexName !== "rango" && <div key={index}>
+                     <RouteCard
                       data={data}
                       index={index}
                       setTradeClicked={setTradeClicked}
                     />
                   </div>
-                ))
+                //  (
+                //   {data?.dexName !== 'Rango'}
+                //   <div key={index}>
+                //     <RouteCard
+                //       data={data}
+                //       index={index}
+                //       setTradeClicked={setTradeClicked}
+                //     />
+                //   </div>
+
+                // )
+                )
               ) : (
                 <>
                   {[...Array(numberOfSkeletons)].map((_, index) => (
