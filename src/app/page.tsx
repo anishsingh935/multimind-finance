@@ -222,16 +222,17 @@ export default function Home() {
   };
 
   const validNumber = new RegExp(/^\d*\.?\d*$/);
-
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const amount = e.target.value;
-
+    let amount = e.target.value;
+    amount = String(amount);
+    amount = amount.replace(/,/g, '.');
+    console.log(amount);
     if (validNumber.test(amount)) {
-      setFromData({ ...fromData, amount: Number(amount) });
+        setFromData({ ...fromData, amount: Number(amount) });
     } else {
-      e.target.value = fromData.amount.toString();
+        e.target.value = fromData.amount.toString();
     }
-  };
+};
 
   const configureWallet = async () => {
 
@@ -260,6 +261,7 @@ export default function Home() {
 
 
   useEffect(() => {
+    console.log(fromData.amount);
     if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
       fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
         .then((balance:any) => {
@@ -631,14 +633,14 @@ export default function Home() {
           </div>
           { showAirouting && (
             <div
-              className="flex justify-between w-[50%] text-[20px] text-white mt-[26px] px-[15px] py-[33px] border-[1px] border-[#27272A]"
+              className="flex justify-between w-[50%] text-[20px] text-white mt-[26px] px-[15px] py-[23px]  bg-[#18181b] rounded-t-lg"
             >
               <h1>AI Routing</h1> <TbRefresh />
             </div>
           )}
           {showAirouting && (
             <div
-              className="w-[50%] overflow-x-scroll h-[200px] bg-[#18181b] px-[15px] flex flex-row pt-[10px] gap-[10px]"
+              className="w-[50%] overflow-x-scroll h-[200px] bg-[#18181b] px-[15px] py-[20px] flex flex-row pt-[10px] gap-[10px]"
             >
               {providerArray.length>0 ? providerArray?.map((data, index) => (
                 <div key={index}>
