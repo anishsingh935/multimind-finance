@@ -154,6 +154,7 @@ export default function Home() {
         console.log(blockchainFrom);
         console.log(blockchainTo);
         setShowAirouting(true);
+        setProviderArray([]);
         const result = await calculateTrades(
           blockchainFrom,
           fromData.tokenAddress,
@@ -169,6 +170,7 @@ export default function Home() {
       
     } catch (error) {
       console.error("Error fetching trades:", error);
+      se
     }
   }
 
@@ -402,7 +404,7 @@ export default function Home() {
               style={{ fontSize: "20px", fontWeight: "600" }}
               className="w-full flex px-5 py-4  justify-between"
             >
-              <h1>MultiMind Finance</h1> <TbRefresh />
+              <h1>MultiMind Finance</h1> 
             </div>
             <div className="border-[1px] border-[#27272A]"></div>
             <div>
@@ -694,11 +696,11 @@ export default function Home() {
                   zIndex: 0,
                 }}
               >
-                <CheckBalance
+                {/* <CheckBalance
                   tokenAddress={fromData.tokenAddress}
                   fromAmount={fromData.amount}
                   location={'card'}
-                />
+                /> */}
               </div>
             </div>
           </div>
@@ -717,7 +719,7 @@ export default function Home() {
               }}
               className="w-full flex px-5 justify-between"
             >
-              <h1>AI Routing</h1> <TbRefresh />
+              <h1>AI Routing</h1> <TbRefresh onClick={fetchTrades} className={`${providerArray!=null ? "cursor-pointer": "cursor-wait"} active:animate-spin`} />
             </div>
           )}
           {showAirouting ? (
