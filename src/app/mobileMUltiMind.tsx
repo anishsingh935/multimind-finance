@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState,CSSProperties } from "react";
 import axios from "axios";
 
 import "@rainbow-me/rainbowkit/styles.css";
@@ -37,6 +37,7 @@ import DialogModal from "@/components/dialogModal";
 import configuration from "./rubic";
 import { Alchemy, Network } from "alchemy-sdk";
 import SkeletonSection from "@/components/skeleton-section";
+import ScaleLoader from "react-spinners/ScaleLoader";
 type MyBlockchainName = "ETHEREUM" | "POLYGON" | "AVALANCHE" | "SOLANA";
 
 declare global {
@@ -172,6 +173,7 @@ export default function MobileHome() {
         console.log(blockchainFrom);
         console.log(blockchainTo);
         setShowAirouting(true);
+        setProviderArray([]);
         const result = await calculateTrades(
           blockchainFrom,
           fromData.tokenAddress,
@@ -350,16 +352,19 @@ export default function MobileHome() {
           console.log("swap function called success");
           alert(`Transaction was successfull ${hash}`);
           console.log(hash);
-          setLoading(true);
+          setLoading(false);
         })
         .catch((err) => {
-          console.log("swap function called failed");
+          console.log("Swap function called failed");
           console.error(err);
-          setLoading(true);
+          alert(`Swap Transaction failed`);
+          setLoading(false);
+
         });
       console.log("Trade executed:", receipt);
     } catch (error) {
       console.error("Error executing trade:", error);
+      setLoading(false);
     }
   };
   const validNumber = new RegExp(/^\d*\.?\d*$/);
@@ -373,6 +378,14 @@ export default function MobileHome() {
     } else {
       e.target.value = fromData.amount.toString();
     }
+  };
+  const override: CSSProperties = {
+    display: "flex",
+    justifyItems: "center",
+    alignItems: "center",
+    margin: "0 auto",
+    borderColor: "white",
+    marginTop: "20vh",
   };
 
   return (
@@ -414,7 +427,12 @@ export default function MobileHome() {
           style={{ fontSize: "20px", fontWeight: "600" }}
           className="w-full flex px-5 py-4  justify-between"
         >
-          <h1>MultiMind Finance</h1> <TbRefresh />
+          <h1>MultiMind Finance</h1> <TbRefresh
+                onClick={fetchTrades}
+                className={`${
+                  providerArray != null ? "cursor-pointer" : "cursor-wait"
+                } active:animate-spin`}
+              />
         </div>
         <div className="border-[1px] border-[#27272A]"></div>
         <div>
@@ -771,16 +789,23 @@ export default function MobileHome() {
           )}
         </div>
       )}
-      {/* { providerArray?.length > 0 && <div style={{ fontSize: "20px",  width: "95%",fontWeight: "600",borderTopLeftRadius: "20px",borderTopRightRadius: "20px", padding: "15px 33px",marginTop:"29vh" }} className="w-full flex px-5 justify-between"><h1>AI Routing</h1> <TbRefresh /></div>}
-      {providerArray?.length > 0 && <div
-        style={{ width: "95%", overflowY:"scroll",padding: "15px", display: "flex", flexDirection: "column",  paddingTop:"10px", gap:"10px" }}
-      >
-        {providerArray?.map((data, index) => (
-          <div key={index}>
-            <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
-        </div>
-        ))}
-      </div>} */}
+      {loading && (
+      <ScaleLoader
+        className="overlay"
+        color="#36d7b7"
+        style={{
+          position: "absolute",
+          top: "0",
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: "999",
+        }}
+      />
+    )}
     </div>
+    
   );
 }

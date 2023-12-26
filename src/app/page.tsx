@@ -308,6 +308,7 @@ export default function Home() {
         .catch((err) => {
           console.log("swap function called failed");
           console.error(err);
+          alert(`Swap Transaction failed`);
           setLoading(false);
         });
       console.log("Trade executed:", receipt);
