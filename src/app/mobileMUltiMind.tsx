@@ -177,6 +177,7 @@ export default function MobileHome() {
   
         console.log("Result = ", result);
         setProviderArray(result);
+        configureWallet();
       }
       
     } catch (error) {
@@ -297,14 +298,12 @@ export default function MobileHome() {
   useEffect(() => {
     if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
         setLoading(true);
-        console.log("Performing Swap");
             performSwap(TradeClicked);
-          // } else {
-          //   alert(`Insufficient Balance for Transaction`);
-          //   console.log("Insufficient Balance");
-          // }
         }
-      },[TradeClicked, fromData])
+        else if (!isConnected && fromData.amount > 0 && fromData.tokenAddress ){
+          alert("Please Connect Your Wallet");
+        }
+      },[TradeClicked])
   
   
 
