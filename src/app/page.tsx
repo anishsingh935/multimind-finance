@@ -216,8 +216,10 @@ export default function Home() {
   const validNumber = new RegExp(/^\d*\.?\d*$/);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const amount = e.target.value;
-
+    let amount = e.target.value;
+    amount=String(amount);
+    amount = amount.replace(/,/g, '.');
+    console.log(amount);
     if (validNumber.test(amount)) {
       setFromData({ ...fromData, amount: Number(amount) });
     } else {
@@ -374,13 +376,17 @@ export default function Home() {
           }}
           className="bgImg"
         >
-          <nav className="flex w-full justify-start items-start">
-            <Image src="/MUFI.png" width={100} height={100} alt="navicon" className="pl-4 ml-5 mt-2 object-cover" />
-            {/* <button></button> */}
+          <nav className="flex w-full justify-between items-center px-6  mt-2">
+            <Image src="/MUFI.png" width={100} height={100} alt="navicon" className=" object-cover" />
+            <CheckBalance
+                  tokenAddress={fromData.tokenAddress}
+                  fromAmount={fromData.amount}
+                  location={'top'}
+                />
           </nav>
           <div
             style={{
-              marginTop: "-5vh",
+              marginTop: "5vh",
               width: "50%",
               background: "#18181B",
               borderRadius: "20px",
@@ -388,7 +394,7 @@ export default function Home() {
               display: "flex",
               flexDirection: "column",
               paddingTop: "10px",
-              height: "55vh",
+              // height: "55vh",
               zIndex: "10",
             }}
           >
@@ -403,7 +409,7 @@ export default function Home() {
               <div
                 style={{
                   background: "#18181B",
-                  height: "90%",
+                  // height: "90%",
                   width: "100%",
                   borderRadius: "24px",
                   display: "flex",
@@ -644,11 +650,11 @@ export default function Home() {
                         marginTop: "-15px",
                       }}
                     >
-                      <span className="font-normal text-md">
+                      <span className="font-bold text-lg">
                         {" "}
                         {toData?.token ? toData?.token : "Coin name"}{" "}
                       </span>
-                      <span className="font-bold text-lg">
+                      <span className="font-normal text-lg text-[#52525B]">
                         {" "}
                         {toData?.network
                           ? toData?.network
@@ -687,6 +693,7 @@ export default function Home() {
                 <CheckBalance
                   tokenAddress={fromData.tokenAddress}
                   fromAmount={fromData.amount}
+                  location={'card'}
                 />
               </div>
             </div>
@@ -709,7 +716,7 @@ export default function Home() {
               <h1>AI Routing</h1> <TbRefresh />
             </div>
           )}
-          {showAirouting && (
+          {showAirouting ? (
             <div
               style={{
                 width: "50%",
@@ -740,6 +747,27 @@ export default function Home() {
             }
 
             </div>
+          ):(
+            <div
+            className="w-[50%] bg-transparent mt-10 space-y-4"
+          >
+            <div className="flex space-x-6 text-center justify-center items-center ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="4" height="28" viewBox="0 0 4 28" fill="none">
+<path d="M2 2L2 26" stroke="#3F3F46" stroke-width="4" stroke-linecap="round"/>
+</svg>
+            <h1 className="font-extrabold text-transparent text-4xl bg-clip-text bg-gradient-to-r from-[#3C38FF] to-[#EC476E]">
+          MultiMind Finance
+          </h1>
+          <svg xmlns="http://www.w3.org/2000/svg" width="4" height="28" viewBox="0 0 4 28" fill="none">
+<path d="M2 2L2 26" stroke="#3F3F46" stroke-width="4" stroke-linecap="round"/>
+</svg>
+              </div>
+          
+          <p className=" text-[#71717A] text-center">
+          With the capacity to easily access and transact across more than 50 blockchains and testnets, our ecosystem is built to empower users to interact with diverse and unlimited blockchain networks. Multimind Finance is the doorway to an innovative and seamless decentralized financial environment, offering the best rates, most liquidity, and unmatched transaction speeds.
+          </p>
+            
+          </div>
           )}
         </div>
       </div>

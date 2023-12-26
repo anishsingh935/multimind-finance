@@ -138,8 +138,15 @@
   justify-content: center;
   z-index: 999;
 }
+/* .walletClass div :nth-child(1){
+  display: none !important;
 
-.walletClass div button {
+} */
+
+.walletClass div button { 
+  /* display: flex !important; */
+  justify-content: center !important;
+  align-items: center !important;
   background-color: var(
     --GR,
     linear-gradient(91deg, #3c38ff 0.09%, #ec476e 51.34%, #ff9f76 118.21%)
@@ -152,6 +159,14 @@
   color: white !important;
   text-align: center !important;
 }
+
+
+.walletClass div button div {
+  background-color: transparent !important;
+  border: none !important;
+} 
+
+
 
 .mobileView {
   display: none;

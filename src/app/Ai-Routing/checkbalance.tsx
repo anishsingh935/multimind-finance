@@ -27,14 +27,15 @@ const ERC20_ABI = [
 interface CheckBalanceProps {
   tokenAddress: string;
   fromAmount: number;
+  location: string;
 }
 
-export const CheckBalance: React.FC<CheckBalanceProps> = ({ tokenAddress, fromAmount }) => {
+export const CheckBalance: React.FC<CheckBalanceProps> = ({ tokenAddress, fromAmount,location }) => {
   const { address, isConnected } = useAccount();
   const [isSufficientBalance, setIsSufficientBalance] = useState(false);
   return (
-    <div style={{background:"var(--GR, linear-gradient(91deg, #3C38FF 0.09%, #EC476E 51.34%, #FF9F76 118.21%))",borderRadius:"24px", boxShadow:" 16px 11px 50.9px 0px rgba(255, 73, 149, 0.35)",width:"95%"}} className='walletClass'>
-      <ConnectButton label={!isSufficientBalance ? 'Connect Wallet':"insuffcient Balance"} />
+    <div style={{background:"var(--GR, linear-gradient(91deg, #3C38FF 0.09%, #EC476E 51.34%, #FF9F76 118.21%))",borderRadius:"24px", boxShadow:" 16px 11px 50.9px 0px rgba(255, 73, 149, 0.35)",width:`${location=="top"?"15%":"95%"}`,minWidth:"200px"}} className='walletClass'>
+      <ConnectButton label={!isSufficientBalance ? 'Connect Wallet':"insuffcient Balance"} showBalance={false} chainStatus="none"/>
     </div>
   );
 };

@@ -339,9 +339,13 @@ export default function MobileHome() {
     <div
       style={{ display: "flex", flexDirection:"column", color: "white", backgroundColor: "#0E111C", alignItems:"center" }}
     >
-      <nav className="flex w-full justify-start items-start">
-            <Image src="/MUFI.png" width={50} height={50}  alt="navicon" className="pl-0 ml-4 mt-2 object-fill" />
-            {/* <button></button> */}
+                <nav className="flex w-full justify-between items-center px-6  mt-2">
+            <Image src="/MUFI.png" width={60} height={60} alt="navicon" className=" object-cover" />
+            <CheckBalance
+                  tokenAddress={fromData.tokenAddress}
+                  fromAmount={fromData.amount}
+                  location={'top'}
+                />
           </nav>
       <div
         style={{ marginTop: "1vh", width: "90%", borderRadius: "20px", display: "flex", flexDirection: "column", paddingTop:"10px", height:"55vh" }}
@@ -469,6 +473,7 @@ export default function MobileHome() {
                 }}
               >
                   <CheckBalance
+                  location="bottom"
                     tokenAddress={fromData.tokenAddress}
                     fromAmount={fromData.amount}
                   />
