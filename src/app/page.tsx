@@ -1,11 +1,20 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import Image from "next/image";
-import { useEffect, useState,CSSProperties  } from "react";
+import { useEffect, useState, CSSProperties } from "react";
 import axios from "axios";
 
 import "@rainbow-me/rainbowkit/styles.css";
 import { Button } from "@/components/ui/button";
-import { BLOCKCHAIN_NAME, CrossChainTrade,OnChainTrade, SDK, WalletProvider, CHAIN_TYPE, Configuration } from "rubic-sdk";
+import {
+  BLOCKCHAIN_NAME,
+  CrossChainTrade,
+  OnChainTrade,
+  SDK,
+  WalletProvider,
+  CHAIN_TYPE,
+  Configuration,
+} from "rubic-sdk";
 import { ethers } from "ethers";
 import { TbRefresh } from "react-icons/tb";
 import { AiOutlineSwap } from "react-icons/ai";
@@ -16,7 +25,7 @@ import { useAccount } from "wagmi";
 import RouteCard from "@/components/route-card";
 import MobileHome from "./mobileMUltiMind";
 import DialogModal from "@/components/dialogModal";
-import configuration from './rubic';
+import configuration from "./rubic";
 import { Alchemy, Network } from "alchemy-sdk";
 import SkeletonSection from "@/components/skeleton-section";
 import ScaleLoader from "react-spinners/ScaleLoader";
@@ -50,7 +59,6 @@ interface Token {
 }
 
 export default function Home() {
-
   const [fromData, setFromData] = useState({
     token: "",
     network: "",
@@ -68,7 +76,16 @@ export default function Home() {
     tokenSymbol: "",
     usdprice: "",
   });
-  const numberOfSkeletons=4;
+
+  const isSolana = () => {
+    if (toData?.token === "Solana" || fromData?.token === "Solana") {
+      return true;
+    }
+    return false;
+  };
+
+  const numberOfSkeletons = 4;
+  const [recieverAddress, setRecieverAddress] = useState<string>("");
   const { isConnected, address } = useAccount();
   const [showAccordion1, setShowAccordion1] = useState(false);
   const [showAccordion2, setShowAccordion2] = useState(false);
@@ -85,9 +102,8 @@ export default function Home() {
   const [searchInput, setSearchInput] = useState("");
   const [TradeClicked, setTradeClicked] = useState<any>();
   const [userBalance, setUserBalance] = useState<string | null>(null);
-  const [showAirouting,setShowAirouting]=useState(false);
-  const [loading,setLoading]=useState(false);
-
+  const [showAirouting, setShowAirouting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchCoinData = async () => {
@@ -115,22 +131,26 @@ export default function Home() {
     fetchCoinData();
   }, []);
 
-  const getAlchemyConfig = (blockchainName:any) => {
-    const apiKeyMapping:any = {
-      'Ethereum': 'R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU',
-      'Polygon': '6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP'
+  const getAlchemyConfig = (blockchainName: any) => {
+    const apiKeyMapping: any = {
+      Ethereum: "R0XpsJFtNE8vdpN3eZpRfWh5TzBfFFsU",
+      Polygon: "6mwmXKoYNk2dqMEqePtoptLbRDaIhQyP",
     };
-    const networkMapping:any = {
-      'Ethereum': Network.ETH_MAINNET,
-      'Polygon': Network.MATIC_MAINNET
+    const networkMapping: any = {
+      Ethereum: Network.ETH_MAINNET,
+      Polygon: Network.MATIC_MAINNET,
     };
     return {
       apiKey: apiKeyMapping[blockchainName],
-      network: networkMapping[blockchainName]
+      network: networkMapping[blockchainName],
     };
   };
 
-  const fetchTokenBalance = async (address:any, tokenAddress:any, blockchain:any) => {
+  const fetchTokenBalance = async (
+    address: any,
+    tokenAddress: any,
+    blockchain: any
+  ) => {
     const alchemyConfig = getAlchemyConfig(blockchain);
     const alchemy = new Alchemy(alchemyConfig);
     try {
@@ -141,12 +161,10 @@ export default function Home() {
       console.error("Error fetching token balance:", error);
     }
   };
-  
 
   async function fetchTrades() {
-
     try {
-      if(fromData?.token && toData?.token && fromData?.amount){
+      if (fromData?.token && toData?.token && fromData?.amount) {
         console.log("fromData in fetchTrades", typeof fromData.token);
         console.log("toData in fetchTrades", typeof toData.token);
         const blockchainFrom = fromData.token.toUpperCase() as MyBlockchainName;
@@ -162,17 +180,15 @@ export default function Home() {
           toData.tokenAddress,
           fromData.amount
         );
-  
+
         console.log("Result = ", result);
         setProviderArray(result);
         configureWallet();
       }
-      
     } catch (error) {
       console.error("Error fetching trades:", error);
     }
   }
-
 
   const calculateToAmount = async () => {
     try {
@@ -218,8 +234,8 @@ export default function Home() {
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     let amount = e.target.value;
-    amount=String(amount);
-    amount = amount.replace(/,/g, '.');
+    amount = String(amount);
+    amount = amount.replace(/,/g, ".");
     console.log(amount);
     if (validNumber.test(amount)) {
       setFromData({ ...fromData, amount: Number(amount) });
@@ -229,20 +245,22 @@ export default function Home() {
   };
 
   const configureWallet = async () => {
-
     if (isConnected && address) {
       const walletProvider: any = {
         [CHAIN_TYPE.EVM]: {
-          address,
-          core: window.ethereum
-        }
+          address : recieverAddress === "" ? address : recieverAddress,
+          core: window.ethereum,
+        },
       };
 
       try {
-        const updatedConfiguration: Configuration = { ...configuration, walletProvider };
+        const updatedConfiguration: Configuration = {
+          ...configuration,
+          walletProvider,
+        };
         const sdk = await SDK.createSDK(updatedConfiguration);
         sdk.updateWalletProvider(walletProvider);
-        sdk.updateWalletAddress(CHAIN_TYPE.EVM, address);
+        sdk.updateWalletAddress(CHAIN_TYPE.EVM, recieverAddress === "" ? address : recieverAddress);
         console.log("SDK configuration successful");
       } catch (error) {
         console.error("Error in SDK configuration:", error);
@@ -252,66 +270,49 @@ export default function Home() {
 
   useEffect(() => {
     configureWallet();
-  }, [address, isConnected]);
-
-
-  // useEffect(() => {
-  //   if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
-  //       setLoading(true);
-  //     fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
-  //       .then((balance:any) => {
-  //         if (parseFloat(balance) >= fromData.amount) {
-  //           performSwap(TradeClicked);
-  //         } else {
-  //           alert(`Insufficient Balance for Transaction`);
-  //           console.log("Insufficient Balance");
-  //         }
-  //         setLoading(false);
-  //       })
-
-  //       .catch(error => console.error(error));
-  //   }
-  // }, [TradeClicked, fromData]);
+  }, [address, isConnected, recieverAddress]);
 
   useEffect(() => {
-    if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
-        setLoading(true);
-            performSwap(TradeClicked);
-        }
-        else if (!isConnected && fromData.amount > 0 && fromData.tokenAddress ){
-          alert("Please Connect Your Wallet");
-        }
-      },[TradeClicked])
-
-  
+    if (
+      fromData.tokenAddress &&
+      address &&
+      isConnected &&
+      fromData.amount > 0 &&
+      toData.tokenAddress
+    ) {
+      setLoading(true);
+      performSwap(TradeClicked);
+    } else if (!isConnected && fromData.amount > 0 && fromData.tokenAddress) {
+      alert("Please Connect Your Wallet");
+    }
+  }, [TradeClicked]);
 
   const performSwap = async (bestTrade: any) => {
-
     try {
-
-      const trade = bestTrade.trade as CrossChainTrade | OnChainTrade ;
+      const trade = bestTrade.trade as CrossChainTrade | OnChainTrade;
       console.log(trade);
 
-      const receipt = trade.swap(
-        {
-          onConfirm: (hash: any) => console.log('Transaction Hash:', hash),
-        }).then(hash => {
+      const receipt = trade
+        .swap({
+          onConfirm: (hash: any) => console.log("Transaction Hash:", hash),
+        })
+        .then((hash) => {
           console.log("swap function called success");
           alert(`Transaction was successfull ${hash}`);
           console.log(hash);
           setLoading(false);
-        }).catch(err => {
+        })
+        .catch((err) => {
           alert("SWAP TRANSACTION FAILED");
           console.log("swap function called failed");
           console.error(err);
           setLoading(false);
         });
-      console.log('Trade executed:', receipt);
+      console.log("Trade executed:", receipt);
     } catch (error) {
-      console.error('Error executing trade:', error);
+      console.error("Error executing trade:", error);
     }
   };
-
 
   const handleTokenSelection1 = (tokenName: string, tokenImage: string) => {
     const selectedToken: Token = {
@@ -358,12 +359,22 @@ export default function Home() {
   };
   const override: CSSProperties = {
     display: "flex",
-    justifyItems:"center",
-    alignItems:"center",
+    justifyItems: "center",
+    alignItems: "center",
     margin: "0 auto",
     borderColor: "white",
-    marginTop:"20vh"
+    marginTop: "20vh",
   };
+
+  useEffect(() => {
+    console.log(toData?.token);
+    if(isConnected) {
+      setRecieverAddress(address?.toString() || "");
+    }
+    if(toData?.token === "Solana" || fromData?.token === "Solana") {
+      setRecieverAddress("");
+    }
+  }, [isConnected, toData, fromData, address])
   return (
     <>
       <div className="webView z-[10]">
@@ -378,12 +389,18 @@ export default function Home() {
           className="bgImg"
         >
           <nav className="flex w-full justify-between items-center px-6  mt-2">
-            <Image src="/MUFI.png" width={100} height={100} alt="navicon" className=" object-cover" />
+            <Image
+              src="/MUFI.png"
+              width={100}
+              height={100}
+              alt="navicon"
+              className=" object-cover"
+            />
             <CheckBalance
-                  tokenAddress={fromData.tokenAddress}
-                  fromAmount={fromData.amount}
-                  location={'top'}
-                />
+              tokenAddress={fromData.tokenAddress}
+              fromAmount={fromData.amount}
+              location={"top"}
+            />
           </nav>
           <div
             style={{
@@ -403,7 +420,7 @@ export default function Home() {
               style={{ fontSize: "20px", fontWeight: "600" }}
               className="w-full flex px-5 py-4  justify-between"
             >
-              <h1>MultiMind Finance</h1> 
+              <h1>MultiMind Finance</h1>
             </div>
             <div className="border-[1px] border-[#27272A]"></div>
             <div>
@@ -535,13 +552,13 @@ export default function Home() {
                       value={value}
                       handleNetworkRender={handleNetworkRender}
                       handleTokenSelection={handleTokenSelection1}
-                      type={'from'}
+                      type={"from"}
                       showAccordion={showAccordion1}
                       setShowAccordion={setShowAccordion1}
                     />
                   )}
                   <input
-                    type="text"
+                    type="number"
                     placeholder="Enter an Amount"
                     className="bg-[#52525B] border-2 text-neutral-400 w-[100%] h-[40%] px-[16px] py-[12px] flex bg-transparent text-2xl border-none focus:border-none float-right rounded-[22px] inputclass"
                     value={fromData.amount}
@@ -672,7 +689,7 @@ export default function Home() {
                       value={value}
                       handleNetworkRender={handleNetworkRender}
                       handleTokenSelection={handleTokenSelection2}
-                      type={'to'}
+                      type={"to"}
                       showAccordion={showAccordion2}
                       setShowAccordion={setShowAccordion2}
                     />
@@ -686,24 +703,22 @@ export default function Home() {
                   />
                 </div>
               </div>
-              <div
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  zIndex: 0,
-                }}
-              >
-                {/* <CheckBalance
-                  tokenAddress={fromData.tokenAddress}
-                  fromAmount={fromData.amount}
-                  location={'card'}
-                /> */}
+              <div className="px-5 flex items-center justify-center w-full z-0">
+                <input
+                  type="text"
+                  value={recieverAddress}
+                  onChange={(e) => {
+                    setRecieverAddress(e.target.value);
+                    console.log(recieverAddress);
+                    
+                  }}
+                  placeholder="Wallet Address"
+                  className="placeholder:text-[18px] text-[18px] bg-[#52525B] border-2 text-neutral-400 w-[100%] h-[40%] px-[16px] py-[12px] flex bg-transparent text-2xl focus:border-none float-right rounded-[22px]"
+                />
               </div>
             </div>
           </div>
-          { showAirouting && (
+          {showAirouting && (
             <div
               style={{
                 fontSize: "20px",
@@ -718,7 +733,13 @@ export default function Home() {
               }}
               className="w-full flex px-5 justify-between"
             >
-              <h1>AI Routing</h1> <TbRefresh onClick={fetchTrades} className={`${providerArray!=null ? "cursor-pointer": "cursor-wait"} active:animate-spin`} />
+              <h1>AI Routing</h1>{" "}
+              <TbRefresh
+                onClick={fetchTrades}
+                className={`${
+                  providerArray != null ? "cursor-pointer" : "cursor-wait"
+                } active:animate-spin`}
+              />
             </div>
           )}
           {showAirouting ? (
@@ -736,59 +757,93 @@ export default function Home() {
                 zIndex: "0",
               }}
             >
-              {providerArray.length>0 ? providerArray?.map((data, index) => (
-                <div key={index}>
-                  <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
-                </div>
-              )): (
-                <>
-                {[...Array(numberOfSkeletons)].map((_, index) => (
+              {providerArray.length > 0 ? (
+                providerArray?.map((data, index) => (
                   <div key={index}>
-                    <SkeletonSection index={index} />
+                    <RouteCard
+                      data={data}
+                      index={index}
+                      setTradeClicked={setTradeClicked}
+                    />
                   </div>
-                ))}
+                ))
+              ) : (
+                <>
+                  {[...Array(numberOfSkeletons)].map((_, index) => (
+                    <div key={index}>
+                      <SkeletonSection index={index} />
+                    </div>
+                  ))}
                 </>
-              )
-            }
-
+              )}
             </div>
-          ):(
-            <div
-            className="w-[50%] bg-transparent mt-10 space-y-4"
-          >
-            <div className="flex space-x-6 text-center justify-center items-center ">
-            <svg xmlns="http://www.w3.org/2000/svg" width="4" height="28" viewBox="0 0 4 28" fill="none">
-<path d="M2 2L2 26" stroke="#3F3F46" stroke-width="4" stroke-linecap="round"/>
-</svg>
-            <h1 className="font-extrabold text-transparent text-4xl bg-clip-text bg-gradient-to-r from-[#3C38FF] to-[#EC476E]">
-          MultiMind Finance
-          </h1>
-          <svg xmlns="http://www.w3.org/2000/svg" width="4" height="28" viewBox="0 0 4 28" fill="none">
-<path d="M2 2L2 26" stroke="#3F3F46" stroke-width="4" stroke-linecap="round"/>
-</svg>
+          ) : (
+            <div className="w-[50%] bg-transparent mt-10 space-y-4">
+              <div className="flex space-x-6 text-center justify-center items-center ">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="4"
+                  height="28"
+                  viewBox="0 0 4 28"
+                  fill="none"
+                >
+                  <path
+                    d="M2 2L2 26"
+                    stroke="#3F3F46"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                <h1 className="font-extrabold text-transparent text-4xl bg-clip-text bg-gradient-to-r from-[#3C38FF] to-[#EC476E]">
+                  MultiMind Finance
+                </h1>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="4"
+                  height="28"
+                  viewBox="0 0 4 28"
+                  fill="none"
+                >
+                  <path
+                    d="M2 2L2 26"
+                    stroke="#3F3F46"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                  />
+                </svg>
               </div>
-          
-          <p className=" text-[#71717A] text-center">
-          With the capacity to easily access and transact across more than 50 blockchains and testnets, our ecosystem is built to empower users to interact with diverse and unlimited blockchain networks. Multimind Finance is the doorway to an innovative and seamless decentralized financial environment, offering the best rates, most liquidity, and unmatched transaction speeds.
-          </p>
-            
-          </div>
+
+              <p className=" text-[#71717A] text-center">
+                With the capacity to easily access and transact across more than
+                50 blockchains and testnets, our ecosystem is built to empower
+                users to interact with diverse and unlimited blockchain
+                networks. Multimind Finance is the doorway to an innovative and
+                seamless decentralized financial environment, offering the best
+                rates, most liquidity, and unmatched transaction speeds.
+              </p>
+            </div>
           )}
         </div>
       </div>
       <div className="mobileView mobbgImg">
         <MobileHome />
       </div>
-      {loading && <ScaleLoader className="overlay" color="#36d7b7" style={{
-        position:"absolute",
-        top:"0",
-        width:"100vw",
-        height:"100vh",
-        display:"flex",
-        alignItems:"center",
-        justifyContent:"center",
-        zIndex:"999"
-      }} />}
+      {loading && (
+        <ScaleLoader
+          className="overlay"
+          color="#36d7b7"
+          style={{
+            position: "absolute",
+            top: "0",
+            width: "100vw",
+            height: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: "999",
+          }}
+        />
+      )}
     </>
   );
 }
