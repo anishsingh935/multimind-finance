@@ -170,7 +170,6 @@ export default function Home() {
       
     } catch (error) {
       console.error("Error fetching trades:", error);
-      se
     }
   }
 
