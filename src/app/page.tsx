@@ -164,6 +164,7 @@ export default function Home() {
   
         console.log("Result = ", result);
         setProviderArray(result);
+        configureWallet();
       }
       
     } catch (error) {
@@ -272,20 +273,20 @@ export default function Home() {
   useEffect(() => {
     if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
         setLoading(true);
-        console.log("Performing Swap");
             performSwap(TradeClicked);
         }
-      },[TradeClicked, fromData])
+        else if (!isConnected && fromData.amount > 0 && fromData.tokenAddress ){
+          alert("Please Connect Your Wallet");
+        }
+      },[TradeClicked])
 
   
 
   const performSwap = async (bestTrade: any) => {
 
-    console.log(bestTrade.trade);
     try {
 
       const trade = bestTrade.trade as CrossChainTrade | OnChainTrade ;
-      console.log("Wallet Connected",address);
       console.log(trade);
 
       const receipt = trade.swap(
