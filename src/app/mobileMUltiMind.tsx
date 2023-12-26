@@ -103,6 +103,7 @@ export default function MobileHome() {
   const [userBalance, setUserBalance] = useState<string | null>(null);
   const [showAirouting, setShowAirouting] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [recieverAddress, setRecieverAddress] = useState<string>("");
 
   const getAlchemyConfig = (blockchainName: any) => {
     const apiKeyMapping: any = {
@@ -296,6 +297,16 @@ export default function MobileHome() {
     configureWallet();
   }, [address, isConnected]);
 
+  useEffect(() => {
+    console.log(toData?.token);
+    if(isConnected) {
+      setRecieverAddress(address?.toString() || "");
+    }
+    if(toData?.token === "Solana" || fromData?.token === "Solana") {
+      setRecieverAddress("");
+    }
+  }, [isConnected, toData, fromData, address])
+
   // useEffect(() => {
   //   if (fromData.tokenAddress && address && isConnected && fromData.amount > 0 && toData.tokenAddress) {
   //     fetchTokenBalance(address, fromData.tokenAddress, fromData.token)
@@ -342,7 +353,6 @@ export default function MobileHome() {
           setLoading(true);
         })
         .catch((err) => {
-          alert("SWAP TRANSACTION FAILED");
           console.log("swap function called failed");
           console.error(err);
           setLoading(true);
@@ -694,11 +704,22 @@ export default function MobileHome() {
               zIndex: 0,
             }}
           >
-            <CheckBalance
+             <input
+                  type="text"
+                  value={recieverAddress}
+                  onChange={(e) => {
+                    setRecieverAddress(e.target.value);
+                    console.log(recieverAddress);
+                    
+                  }}
+                  placeholder="Wallet Address"
+                  className="placeholder:text-[18px] text-[18px] bg-[#52525B] border-2 text-neutral-400 w-[100%] h-[40%] px-[16px] py-[12px] flex bg-transparent text-2xl focus:border-none float-right rounded-[22px]"
+                />
+            {/* <CheckBalance
               location="bottom"
               tokenAddress={fromData.tokenAddress}
               fromAmount={fromData.amount}
-            />
+            /> */}
           </div>
         </div>
       </div>
@@ -731,15 +752,14 @@ export default function MobileHome() {
           }}
         >
           {providerArray.length > 0 ? (
-            providerArray?.map((data, index) => (
-              <div key={index}>
-                <RouteCard
-                  data={data}
-                  index={index}
-                  setTradeClicked={setTradeClicked}
-                />
-              </div>
-            ))
+            providerArray?.map((data, index) => 
+            data.dexName !== "rango" && <div key={index}>
+                     <RouteCard
+                      data={data}
+                      index={index}
+                      setTradeClicked={setTradeClicked}
+                    />
+                  </div>)
           ) : (
             <>
               {[...Array(numberOfSkeletons)].map((_, index) => (
