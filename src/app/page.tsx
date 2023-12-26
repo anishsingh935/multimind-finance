@@ -248,7 +248,7 @@ export default function Home() {
     if (isConnected && address) {
       const walletProvider: any = {
         [CHAIN_TYPE.EVM]: {
-          address : recieverAddress === "" ? address : recieverAddress,
+          address,
           core: window.ethereum,
         },
       };
@@ -258,9 +258,12 @@ export default function Home() {
           ...configuration,
           walletProvider,
         };
+        // const sentAdd = recieverAddress === "" ? address : recieverAddress
+        // console.log(sentAdd, "receiver");
+        
         const sdk = await SDK.createSDK(updatedConfiguration);
         sdk.updateWalletProvider(walletProvider);
-        sdk.updateWalletAddress(CHAIN_TYPE.EVM, recieverAddress === "" ? address : recieverAddress);
+        sdk.updateWalletAddress(CHAIN_TYPE.EVM, address);
         console.log("SDK configuration successful");
       } catch (error) {
         console.error("Error in SDK configuration:", error);
@@ -758,7 +761,7 @@ export default function Home() {
               }}
             >
               {providerArray.length > 0 ? (
-                providerArray?.map((data, index) => (
+                providerArray?.slice(1)?.map((data, index) => (
                   <div key={index}>
                     <RouteCard
                       data={data}
