@@ -31,6 +31,8 @@ interface CheckBalanceProps {
 }
 
 export const CheckBalance: React.FC<CheckBalanceProps> = ({ tokenAddress, fromAmount,location }) => {
+  console.log(location);
+  
   const { address, isConnected } = useAccount();
   const [isSufficientBalance, setIsSufficientBalance] = useState(false);
   return (
