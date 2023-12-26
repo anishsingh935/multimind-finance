@@ -9,23 +9,23 @@ import { BLOCKCHAIN_NAME, CrossChainTrade,OnChainTrade, SDK, WalletProvider, CHA
 import { ethers } from "ethers";
 import { TbRefresh } from "react-icons/tb";
 import { AiOutlineSwap } from "react-icons/ai";
-import CircleImage from "@/app/CircleImage.svg";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CheckBalance } from "./Ai-Routing/checkbalance";
-import calculateTrades from "./Ai-Routing/Trades";
+import { CheckBalance } from "./Ai-Routing/check-balance";
+import calculateTrades from "./Ai-Routing/trades";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import CircleImage from "@/app/CircleImage.svg";
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAccount } from "wagmi";
 import RouteCard from "@/components/route-card";
-import DialogModal from "@/components/dialogModal";
+import DialogModal from "@/components/dialog-modal";
 import configuration from './rubic';
 import { Alchemy, Network } from "alchemy-sdk";
 import SkeletonSection from "@/components/skeleton-section";
@@ -323,16 +323,17 @@ export default function MobileHome() {
 
   return (
     <div
-      style={{ display: "flex", flexDirection:"column", color: "white", backgroundColor: "#0E111C", alignItems:"center" }}
+      className="flex-col text-white bg-[#0E111C] w-full h-screen overflow-y-scroll"
     >
       <nav className="flex w-full justify-start items-start">
             <Image src="/MUFI.png" width={50} height={50}  alt="navicon" className="pl-0 ml-4 mt-2 object-fill" />
             {/* <button></button> */}
           </nav>
       <div
-        style={{ marginTop: "1vh", width: "90%", borderRadius: "20px", display: "flex", flexDirection: "column", paddingTop:"10px", height:"55vh" }}
+        // style={{ marginTop: "1vh", width: "90%", borderRadius: "20px", display: "flex", flexDirection: "column", paddingTop:"10px", height:"55vh" }}
+        className="mt-[1vh] rounded-[20px] flex flex-col bg-[#18181B] w-[90%] h-[90vh] mx-auto"
       >
-        <div style={{ fontSize: "20px", fontWeight: "600" }} className="w-full flex px-5 py-4  justify-between"><h1>MultiMind Finance</h1> <TbRefresh /></div>
+        <div  className="w-full flex px-5 py-4  justify-between text-[20px] font-semibold"><h1>MultiMind Finance</h1> <TbRefresh /></div>
         <div className="border-[1px] border-[#27272A]"></div>
         <div>
         <div
@@ -345,26 +346,70 @@ export default function MobileHome() {
               <Button variant="ghost" className="bg-transparent text-white hover:bg-transparent hover:text-white w-[29%] h-[137px] space-x-2" onClick={() => setShowAccordion1(!showAccordion1)}>
                     {selectedToken1?.image ? (
                       <div className="relative">
-                      <img src={selectedToken1.image} alt="bt-image" style={{width:"50px",height:"50px",maxWidth:"50px",borderRadius:"50%"}}/>
-                      <img src={fromData.tokenSymbol} alt="bt-image"  style={{width:"30px",height:"30px", maxWidth:"30px",borderRadius:"50%",position:"relative",bottom:"20px",left:"25px"}}/>
+                      <Image
+                            src={selectedToken1?.image}
+                            alt="bt-image"
+                            width={50}
+                            height={50}
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              maxWidth: "50px",
+                              borderRadius: "50%",
+                            }}
+                          />
+                     <Image
+                            src={fromData?.tokenSymbol}
+                            alt="bt-image"
+                            width={30}
+                            height={30}
+                            style={{
+                              width: "30px",
+                              height: "30px",
+                              maxWidth: "30px",
+                              borderRadius: "50%",
+                              position: "relative",
+                              bottom: "20px",
+                              left: "25px",
+                            }}
+                          />
                       </div>
                     ) : (
-                      <div className="" style={{display:"flex",flexDirection:"column"}}>
-                        <img
-                        src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
-                        alt="bt-image"
-                        style={{width:"50px",height:"50px",maxWidth:"50px",borderRadius:"50%"}}
-                      />
-                      <img
-                        src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
-                        alt="bt-image"
-                        style={{width:"35px",height:"35px", maxWidth:"35px",borderRadius:"50%",position:"relative",bottom:"20px",left:"25px"}}
-                      />
+                      <div className="flex-col">
+                        <Image
+                            src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
+                            alt="bt-image"
+                            width={50}
+                            height={50}
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              maxWidth: "50px",
+                              borderRadius: "50%",
+                            }}
+                          />
+                          <Image
+                            src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
+                            alt="bt-image"
+                            width={35}
+                            height={35}
+                            style={{
+                              width: "35px",
+                              height: "35px",
+                              maxWidth: "35px",
+                              borderRadius: "50%",
+                              position: "relative",
+                              bottom: "20px",
+                              left: "25px",
+                            }}
+                          />
                       </div>
 
                     )}
                   </Button>
-                    <div style={{display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"flex-start",marginTop:"-15px"}}>
+                    <div 
+                    className="flex-col justify-center items-start mt-[-15px]"
+                    >
                       <span className="font-bold text-lg"> {fromData?.token ? fromData?.token : "Coin name"} </span>
                       <span className="font-normal text-xl text-[#52525B]"> {fromData?.network ? fromData?.network : "Network name"} </span>
                       </div>
@@ -394,7 +439,7 @@ export default function MobileHome() {
           </div>
 
           <div
-          style={{ width: "100%", height:"200px", borderRadius: "24px", padding: "20px",gap:"11px",background:"var(--Dark-90, #18181B)",border: "1px solid var(--Dark-70, #3F3F46)", display:"flex",flexDirection:"column",justifyContent:"center" }}
+          className="w-full h-[200px] flex flex-col justify-center items-center rounded-[24px] p-[20px] gap-[11px] border-[1px] border-[#1818B]"
           >
           <div
            style={{height:"40%",display:"flex",flexDirection:"row",alignItems:"center",gap:"22px"}}
@@ -402,21 +447,64 @@ export default function MobileHome() {
             <Button variant="ghost" className="w-[29%] h-[137px] bg-transparent text-white hover:bg-transparent hover:text-white" onClick={() => setShowAccordion2(!showAccordion2)}>
                   {selectedToken2?.image ? (
                      <div className="relative">
-                     <img src={selectedToken2.image} alt="bt-image" style={{width:"50px",height:"50px",maxWidth:"50px",borderRadius:"50%"}}/>
-                     <img src={toData.tokenSymbol} alt="bt-image"  style={{width:"30px",height:"30px", maxWidth:"30px",borderRadius:"50%",position:"relative",bottom:"20px",left:"25px"}}/>
+                    <Image
+                            src={selectedToken2?.image}
+                            alt="bt-image"
+                            width={50}
+                            height={50}
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              maxWidth: "50px",
+                              borderRadius: "50%",
+                            }}
+                          />
+                          <Image
+                            src={toData?.tokenSymbol}
+                            alt="bt-image"
+                            width={30}
+                            height={30}
+                            style={{
+                              width: "30px",
+                              height: "30px",
+                              maxWidth: "30px",
+                              borderRadius: "50%",
+                              position: "relative",
+                              bottom: "20px",
+                              left: "25px",
+                            }}
+                          />
                      </div>
                   ) : (
                     <div className="relative ">
-                      <img
-                      src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
-                      alt="bt-image"
-                      style={{width:"50px",height:"50px",maxWidth:"50px",borderRadius:"50%"}}
-                    />
-                    <img
-                      src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
-                      alt="bt-image"
-                      style={{width:"35px",height:"35px", maxWidth:"35px",borderRadius:"50%",position:"relative",bottom:"20px",left:"25px"}}
-                    />
+                      <Image
+
+src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
+alt="bt-image"
+width={50}
+height={50}
+style={{
+  width: "50px",
+  height: "50px",
+  maxWidth: "50px",
+  borderRadius: "50%",
+}}
+/>
+<Image
+src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
+alt="bt-image"
+width={35}
+height={35}
+style={{
+  width: "35px",
+  height: "35px",
+  maxWidth: "35px",
+  borderRadius: "50%",
+  position: "relative",
+  bottom: "20px",
+  left: "25px",
+}}
+/>
                     </div>
                   )}
                 </Button>
@@ -446,13 +534,7 @@ export default function MobileHome() {
 
         </div>
         <div
-         style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  zIndex: 0,
-                }}
+                className="w-full flex justify-center items-center z-0"
               >
                   <CheckBalance
                     tokenAddress={fromData.tokenAddress}
@@ -464,30 +546,17 @@ export default function MobileHome() {
       { showAirouting && (
             <div
             style={{
-              fontSize: "20px",
-              width: "95%",
-              fontWeight: "600",
               borderTopLeftRadius: "20px",
               borderTopRightRadius: "20px",
-              padding: "15px 33px",
-              marginTop: "29vh",
             }}
-            className="w-full flex px-5 justify-between"
+            className="flex justify-between w-[95%] text-[20px] text-white mt-[26px] px-[15px] py-[33px] border-[1px] border-[#27272A]"
           >
               <h1>AI Routing</h1> <TbRefresh />
             </div>
           )}
           {showAirouting && (
              <div
-             style={{
-               width: "95%",
-               overflowY: "scroll",
-               padding: "15px",
-               display: "flex",
-               flexDirection: "column",
-               paddingTop: "10px",
-               gap: "10px",
-             }}
+              className="flex justify-between w-[95%] text-[20px] text-white mt-[26px] px-[15px] py-[33px] border-[1px] border-[#27272A]"
            >
               {providerArray.length>0 ? providerArray?.map((data, index) => (
                 <div key={index}>
@@ -506,16 +575,6 @@ export default function MobileHome() {
 
             </div>
           )}
-      {/* { providerArray?.length > 0 && <div style={{ fontSize: "20px",  width: "95%",fontWeight: "600",borderTopLeftRadius: "20px",borderTopRightRadius: "20px", padding: "15px 33px",marginTop:"29vh" }} className="w-full flex px-5 justify-between"><h1>AI Routing</h1> <TbRefresh /></div>}
-      {providerArray?.length > 0 && <div
-        style={{ width: "95%", overflowY:"scroll",padding: "15px", display: "flex", flexDirection: "column",  paddingTop:"10px", gap:"10px" }}
-      >
-        {providerArray?.map((data, index) => (
-          <div key={index}>
-            <RouteCard data={data} index={index} setTradeClicked={setTradeClicked} />
-        </div>
-        ))}
-      </div>} */}
     </div>
   );
 }

@@ -101,14 +101,14 @@
   box-shadow: none;
 }
 .bgImg {
-  background-image: url("../../public/bg2.png");
+  background-image: url("../../public/png/bg2.png");
   background-position: center;
   object-fit: cover;
   background-size: cover;
   width: 100%;
 }
 .mobbgImg {
-  background-image: url("../../public/bg.png");
+  background-image: url("../../public/png/bg.png");
   background-position: center;
   object-fit: cover;
   background-size: cover;

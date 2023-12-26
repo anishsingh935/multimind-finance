@@ -14,7 +14,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CheckBalance } from "./Ai-Routing/checkbalance";
+import { CheckBalance } from "./Ai-Routing/check-balance";
 import calculateTrades from "./Ai-Routing/Trades";
 import {
   Accordion,
@@ -25,11 +25,12 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAccount } from "wagmi";
 import RouteCard from "@/components/route-card";
-import MobileHome from "./mobileMUltiMind";
-import DialogModal from "@/components/dialogModal";
+import MobileHome from "./mobile-multimind";
+import DialogModal from "@/components/dialog-modal";
 import configuration from './rubic';
 import { Alchemy, Network } from "alchemy-sdk";
 import SkeletonSection from "@/components/skeleton-section";
+import { ImageError } from "next/dist/server/image-optimizer";
 type MyBlockchainName = "ETHEREUM" | "POLYGON" | "AVALANCHE" | "SOLANA";
 
 declare global {
@@ -363,17 +364,9 @@ export default function Home() {
           </nav>
           <div
             style={{
-              marginTop: "-5vh",
-              width: "50%",
-              background: "#18181B",
-              borderRadius: "20px",
-              padding: "20px",
-              display: "flex",
-              flexDirection: "column",
-              paddingTop: "10px",
-              height: "55vh",
               zIndex: "10",
             }}
+            className="mt-[-5vh] w-50% bg-[#18181B] rounded-[20px] px-[20px] flex flex-col pt-[10px] h-[45vh]"
           >
             <div
               style={{ fontSize: "20px", fontWeight: "600" }}
@@ -384,42 +377,13 @@ export default function Home() {
             <div className="border-[1px] border-[#27272A]"></div>
             <div>
               <div
-                style={{
-                  background: "#18181B",
-                  height: "90%",
-                  width: "100%",
-                  borderRadius: "24px",
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  flexWrap: "wrap",
-                  padding: "20px",
-                  alignItems: "center",
-                  marginTop: "4px",
-                }}
+                className="bg-[#18181B] rounded-[24px] flex flex-row justify-between flex-wrap p-[20px] items-center mt-[4px]"
               >
                 <div
-                  style={{
-                    width: "45%",
-                    height: "180px",
-                    borderRadius: "24px",
-                    padding: "20px",
-                    gap: "11px",
-                    background: "#27272A",
-                    border: "1px solid var(--Dark-70, #3F3F46)",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                  }}
+                  className="w-[45%] h-[180px] rounded-[24px] p-[20px] gap-[11px] bg-[#27272A] border-[1px] border-[#3F3F46] flex flex-col justify-center"
                 >
                   <div
-                    style={{
-                      height: "40%",
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: "22px",
-                    }}
+                    className="h-[40%] flex flex-row items-center gap-[22px]"
                   >
                     <Button
                       variant="ghost"
@@ -428,9 +392,11 @@ export default function Home() {
                     >
                       {selectedToken1?.image ? (
                         <div className="relative">
-                          <img
+                          <Image
                             src={selectedToken1?.image}
                             alt="bt-image"
+                            width={50}
+                            height={50}
                             style={{
                               width: "50px",
                               height: "50px",
@@ -438,9 +404,11 @@ export default function Home() {
                               borderRadius: "50%",
                             }}
                           />
-                          <img
+                          <Image
                             src={fromData?.tokenSymbol}
                             alt="bt-image"
+                            width={30}
+                            height={30}
                             style={{
                               width: "30px",
                               height: "30px",
@@ -457,9 +425,11 @@ export default function Home() {
                           className=""
                           style={{ display: "flex", flexDirection: "column" }}
                         >
-                          <img
+                          <Image
                             src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
                             alt="bt-image"
+                            width={50}
+                            height={50}
                             style={{
                               width: "50px",
                               height: "50px",
@@ -467,9 +437,11 @@ export default function Home() {
                               borderRadius: "50%",
                             }}
                           />
-                          <img
+                          <Image
                             src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
                             alt="bt-image"
+                            width={35}
+                            height={35}
                             style={{
                               width: "35px",
                               height: "35px",
@@ -484,13 +456,7 @@ export default function Home() {
                       )}
                     </Button>
                     <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "flex-start",
-                        marginTop: "-15px",
-                      }}
+                    className="flex flex-col justify-center items-start mt-[-15px]"
                     >
                       <span className="font-bold text-lg">
                         {" "}
@@ -526,29 +492,12 @@ export default function Home() {
                 <div
                   style={{ display: "flex", flexDirection: "row", gap: "2px" }}
                 >
-                  <Image
-                    src={CircleImage}
-                    alt="arrow"
-                    width={50}
-                    height={50}
-                    className="rounded-full mt-2"
-                  />
+                  <Image src={CircleImage} alt="arrow" width={50} height={50}  className="rounded-full mt-2" />
                   {/* <AiOutlineSwap className="text-3xl rounded-full mr-1 border-2 " /> */}
                 </div>
 
                 <div
-                  style={{
-                    width: "45%",
-                    height: "180px",
-                    borderRadius: "24px",
-                    padding: "20px",
-                    gap: "11px",
-                    background: "#27272A",
-                    border: "1px solid var(--Dark-70, #3F3F46)",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                  }}
+                  className="w-[45%] h-[180px] rounded-[24px] p-[20px] gap-[11px] bg-[#27272A] border-[1px] border-[#3F3F46] flex flex-col justify-center"
                 >
                   <div
                     style={{
@@ -566,9 +515,11 @@ export default function Home() {
                     >
                       {selectedToken2?.image ? (
                         <div className="relative">
-                          <img
+                          <Image
                             src={selectedToken2?.image}
                             alt="bt-image"
+                            width={50}
+                            height={50}
                             style={{
                               width: "50px",
                               height: "50px",
@@ -576,9 +527,11 @@ export default function Home() {
                               borderRadius: "50%",
                             }}
                           />
-                          <img
+                          <Image
                             src={toData?.tokenSymbol}
                             alt="bt-image"
+                            width={30}
+                            height={30}
                             style={{
                               width: "30px",
                               height: "30px",
@@ -592,9 +545,12 @@ export default function Home() {
                         </div>
                       ) : (
                         <div className="relative ">
-                          <img
+                          <Image
+
                             src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
                             alt="bt-image"
+                            width={50}
+                            height={50}
                             style={{
                               width: "50px",
                               height: "50px",
@@ -602,9 +558,11 @@ export default function Home() {
                               borderRadius: "50%",
                             }}
                           />
-                          <img
+                          <Image
                             src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
                             alt="bt-image"
+                            width={35}
+                            height={35}
                             style={{
                               width: "35px",
                               height: "35px",
@@ -660,12 +618,9 @@ export default function Home() {
               </div>
               <div
                 style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
                   zIndex: 0,
                 }}
+                className="w-full flex justify-center items-center mt-[20px]"
               >
                 <CheckBalance
                   tokenAddress={fromData.tokenAddress}
@@ -676,36 +631,14 @@ export default function Home() {
           </div>
           { showAirouting && (
             <div
-              style={{
-                fontSize: "20px",
-                width: "50%",
-                fontWeight: "600",
-                borderTopLeftRadius: "20px",
-                borderTopRightRadius: "20px",
-                background: "#18181b",
-                padding: "15px 33px",
-                marginTop: "26px",
-                zIndex: "10",
-              }}
-              className="w-full flex px-5 justify-between"
+              className="flex justify-between w-[50%] text-[20px] text-white mt-[26px] px-[15px] py-[33px] border-[1px] border-[#27272A]"
             >
               <h1>AI Routing</h1> <TbRefresh />
             </div>
           )}
           {showAirouting && (
             <div
-              style={{
-                width: "50%",
-                overflowX: "scroll",
-                height: "200px",
-                background: "#18181b",
-                padding: "15px",
-                display: "flex",
-                flexDirection: "row",
-                paddingTop: "10px",
-                gap: "10px",
-                zIndex: "10",
-              }}
+              className="w-[50%] overflow-x-scroll h-[200px] bg-[#18181b] px-[15px] flex flex-row pt-[10px] gap-[10px]"
             >
               {providerArray.length>0 ? providerArray?.map((data, index) => (
                 <div key={index}>
