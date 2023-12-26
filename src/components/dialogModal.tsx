@@ -16,14 +16,18 @@ function DialogModal({
   handleTokenSelection,
   value,
   handleNetworkset,
-  type
+  type,
+  showAccordion,
+  setShowAccordion
 }: {
   coinData: any,
   handleNetworkRender: Function,
   handleTokenSelection: Function,
   value: any,
   handleNetworkset: Function,
-  type: any
+  showAccordion: boolean,
+  type: any,
+  setShowAccordion: Function
 }) {
   const [searchInput, setSearchInput] = useState("");
   const [getfiltedArray, setGetFiltedArray] = useState<any | null>([]);
@@ -63,7 +67,13 @@ function DialogModal({
         border: "2px solid var(--Dark-80, #27272A)"
       }}>
         <div className="flex flex-col items-center text-start">
-          <span className="text-2xl text-white font-bold mb-4 ">Networks</span>
+          <div className='flex w-full justify-between mb-4 px-2'>
+          <span className="text-2xl text-white font-bold ">Networks</span>
+          <button className="text-white font-bold text-2xl border-1  rounded-full hover:border-white" onClick={() => setShowAccordion(!showAccordion)}><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+</svg>
+</button>
+          </div>
           
           <div className="w-full">
             <Input

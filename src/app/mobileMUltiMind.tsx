@@ -395,6 +395,8 @@ export default function MobileHome() {
                handleNetworkRender={handleNetworkRender}
                handleTokenSelection={handleTokenSelection1}
                type={'from'}
+               showAccordion={showAccordion1}
+                      setShowAccordion={setShowAccordion1}
              />)}
 
                 <input
@@ -451,6 +453,8 @@ export default function MobileHome() {
                handleNetworkRender={handleNetworkRender}
                handleTokenSelection={handleTokenSelection2}
                type={'to'}
+               showAccordion={showAccordion2}
+                      setShowAccordion={setShowAccordion2}
              />
               )} 
                 <input

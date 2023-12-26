@@ -1,5 +1,6 @@
 .cardWidth{
     width: 280px;
+    z-index: 0;
 }
 
 @media (max-width: 520px) {

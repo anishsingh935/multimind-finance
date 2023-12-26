@@ -535,10 +535,12 @@ export default function Home() {
                       handleNetworkRender={handleNetworkRender}
                       handleTokenSelection={handleTokenSelection1}
                       type={'from'}
+                      showAccordion={showAccordion1}
+                      setShowAccordion={setShowAccordion1}
                     />
                   )}
                   <input
-                    type="number"
+                    type="text"
                     placeholder="Enter an Amount"
                     className="bg-[#52525B] border-2 text-neutral-400 w-[100%] h-[40%] px-[16px] py-[12px] flex bg-transparent text-2xl border-none focus:border-none float-right rounded-[22px] inputclass"
                     value={fromData.amount}
@@ -670,6 +672,8 @@ export default function Home() {
                       handleNetworkRender={handleNetworkRender}
                       handleTokenSelection={handleTokenSelection2}
                       type={'to'}
+                      showAccordion={showAccordion2}
+                      setShowAccordion={setShowAccordion2}
                     />
                   )}
                   <input
@@ -709,7 +713,7 @@ export default function Home() {
                 background: "#18181b",
                 padding: "15px 33px",
                 marginTop: "26px",
-                zIndex: "10",
+                zIndex: "0",
               }}
               className="w-full flex px-5 justify-between"
             >
@@ -728,7 +732,7 @@ export default function Home() {
                 flexDirection: "row",
                 paddingTop: "10px",
                 gap: "10px",
-                zIndex: "10",
+                zIndex: "0",
               }}
             >
               {providerArray.length>0 ? providerArray?.map((data, index) => (
