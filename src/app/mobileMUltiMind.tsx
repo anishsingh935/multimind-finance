@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState,CSSProperties } from "react";
+import { useEffect, useState, CSSProperties } from "react";
 import axios from "axios";
 
 import "@rainbow-me/rainbowkit/styles.css";
@@ -17,12 +17,12 @@ import {
 import { ethers } from "ethers";
 import { TbRefresh } from "react-icons/tb";
 import { AiOutlineSwap } from "react-icons/ai";
-import CircleImage from "@/app/CircleImage.svg";
+// import CircleImage from "@/app/CircleImage.svg";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CheckBalance } from "./Ai-Routing/checkbalance";
+import { CheckBalance } from "./Ai-Routing/check-balance";
 import calculateTrades from "./Ai-Routing/Trades";
 import {
   Accordion,
@@ -33,7 +33,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAccount } from "wagmi";
 import RouteCard from "@/components/route-card";
-import DialogModal from "@/components/dialogModal";
+import DialogModal from "@/components/dialog-modal";
 import configuration from "./rubic";
 import { Alchemy, Network } from "alchemy-sdk";
 import SkeletonSection from "@/components/skeleton-section";
@@ -65,7 +65,7 @@ interface Token {
   name: string;
   image: string;
 }
-interface apiKey {}
+interface apiKey { }
 
 export default function MobileHome() {
   const [fromData, setFromData] = useState({
@@ -301,10 +301,10 @@ export default function MobileHome() {
 
   useEffect(() => {
     console.log(toData?.token);
-    if(isConnected) {
+    if (isConnected) {
       setRecieverAddress(address?.toString() || "");
     }
-    if(toData?.token === "Solana" || fromData?.token === "Solana") {
+    if (toData?.token === "Solana" || fromData?.token === "Solana") {
       setRecieverAddress("");
     }
   }, [isConnected, toData, fromData, address])
@@ -390,17 +390,11 @@ export default function MobileHome() {
 
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        color: "white",
-        backgroundColor: "#0E111C",
-        alignItems: "center",
-      }}
+      className="w-full flex-col items-self-center justify-center h-full overflow-y-scroll "
     >
-      <nav className="flex w-full justify-between items-center px-6  mt-2">
+      <nav className="flex w-full justify-between items-center px-6 mt-2">
         <Image
-          src="/MUFI.png"
+          src="/png/MUFI.png"
           width={60}
           height={60}
           alt="navicon"
@@ -413,66 +407,24 @@ export default function MobileHome() {
         />
       </nav>
       <div
-        style={{
-          marginTop: "1vh",
-          width: "90%",
-          borderRadius: "20px",
-          display: "flex",
-          flexDirection: "column",
-          paddingTop: "10px",
-          height: "55vh",
-        }}
+        className=" h-[80vh] mt-[5vh] mx-4 bg-[#18181B] flex-col p-[10px] rounded-[20px] pt-[10px] flex justify-center items-center"
       >
         <div
           style={{ fontSize: "20px", fontWeight: "600" }}
-          className="w-full flex px-5 py-4  justify-between"
+          className="w-full flex px-5 py-2 justify-between text-white"
         >
-          <h1>MultiMind Finance</h1> <TbRefresh
-                onClick={fetchTrades}
-                className={`${
-                  providerArray != null ? "cursor-pointer" : "cursor-wait"
-                } active:animate-spin`}
-              />
+          <h1>MultiMind Finance</h1> 
         </div>
         <div className="border-[1px] border-[#27272A]"></div>
         <div>
           <div
-            style={{
-              height: "90%",
-              width: "100%",
-              borderRadius: "24px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "10px",
-              justifyContent: "space-between",
-              padding: "20px",
-              alignItems: "center",
-              marginTop: "4px",
-            }}
+            className="w-full h-[90%] flex flex-col justify-between gap-[10px] px-[20px] py-[20px] mt-[2px] items-center"
           >
             <div
-              style={{
-                color: "white",
-                width: "100%",
-                height: "200px",
-                borderRadius: "24px",
-                padding: "20px",
-                gap: "11px",
-                background: "var(--Dark-80, #27272A)",
-                border: "1px solid var(--Dark-70, #3F3F46)",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
+              className="w-full h-[200px] bg-[#18181B] border-[1px] text-white border-[#3F3F46] rounded-[24px] flex-col justify-center gap-[11px] p-[20px]"
             >
               <div
-                style={{
-                  height: "40%",
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: "22px",
-                }}
+                className="flex items-center gap-[22px] h-[40%]"
               >
                 <Button
                   variant="ghost"
@@ -481,9 +433,11 @@ export default function MobileHome() {
                 >
                   {selectedToken1?.image ? (
                     <div className="relative">
-                      <img
-                        src={selectedToken1.image}
+                      <Image
+                        src={selectedToken1?.image}
                         alt="bt-image"
+                        width={50}
+                        height={50}
                         style={{
                           width: "50px",
                           height: "50px",
@@ -491,9 +445,11 @@ export default function MobileHome() {
                           borderRadius: "50%",
                         }}
                       />
-                      <img
-                        src={fromData.tokenSymbol}
+                      <Image
+                        src={fromData?.tokenSymbol}
                         alt="bt-image"
+                        width={30}
+                        height={30}
                         style={{
                           width: "30px",
                           height: "30px",
@@ -506,13 +462,12 @@ export default function MobileHome() {
                       />
                     </div>
                   ) : (
-                    <div
-                      className=""
-                      style={{ display: "flex", flexDirection: "column" }}
-                    >
-                      <img
+                    <div className="flex-col">
+                      <Image
                         src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
                         alt="bt-image"
+                        width={50}
+                        height={50}
                         style={{
                           width: "50px",
                           height: "50px",
@@ -520,9 +475,11 @@ export default function MobileHome() {
                           borderRadius: "50%",
                         }}
                       />
-                      <img
+                      <Image
                         src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
                         alt="bt-image"
+                        width={35}
+                        height={35}
                         style={{
                           width: "35px",
                           height: "35px",
@@ -537,13 +494,8 @@ export default function MobileHome() {
                   )}
                 </Button>
                 <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "flex-start",
-                    marginTop: "-15px",
-                  }}
+                  className="flex-cols justify-center items-start mt-[-15px]"
+
                 >
                   <span className="font-bold text-lg">
                     {" "}
@@ -582,7 +534,7 @@ export default function MobileHome() {
 
             <div style={{ display: "flex", flexDirection: "row", gap: "2px" }}>
               <Image
-                src={CircleImage}
+                src="/CircleImage.svg"
                 alt="arrow"
                 width={50}
                 height={50}
@@ -592,27 +544,10 @@ export default function MobileHome() {
             </div>
 
             <div
-              style={{
-                width: "100%",
-                height: "200px",
-                borderRadius: "24px",
-                padding: "20px",
-                gap: "11px",
-                background: "var(--Dark-90, #18181B)",
-                border: "1px solid var(--Dark-70, #3F3F46)",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
+              className="w-full h-[200px] text-white bg-[#18181B] border-[1px] border-[#3F3F46] rounded-[24px] flex-col justify-center gap-[11px] p-[20px]"
             >
               <div
-                style={{
-                  height: "40%",
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: "22px",
-                }}
+                className="h-[40%] flex items-center gap-[22px] text-white"
               >
                 <Button
                   variant="ghost"
@@ -621,9 +556,11 @@ export default function MobileHome() {
                 >
                   {selectedToken2?.image ? (
                     <div className="relative">
-                      <img
-                        src={selectedToken2.image}
+                      <Image
+                        src={selectedToken2?.image}
                         alt="bt-image"
+                        width={50}
+                        height={50}
                         style={{
                           width: "50px",
                           height: "50px",
@@ -631,9 +568,11 @@ export default function MobileHome() {
                           borderRadius: "50%",
                         }}
                       />
-                      <img
-                        src={toData.tokenSymbol}
+                      <Image
+                        src={toData?.tokenSymbol}
                         alt="bt-image"
+                        width={30}
+                        height={30}
                         style={{
                           width: "30px",
                           height: "30px",
@@ -647,9 +586,12 @@ export default function MobileHome() {
                     </div>
                   ) : (
                     <div className="relative ">
-                      <img
+                      <Image
+
                         src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
                         alt="bt-image"
+                        width={50}
+                        height={50}
                         style={{
                           width: "50px",
                           height: "50px",
@@ -657,9 +599,11 @@ export default function MobileHome() {
                           borderRadius: "50%",
                         }}
                       />
-                      <img
+                      <Image
                         src="https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/ethereum.svg"
                         alt="bt-image"
+                        width={35}
+                        height={35}
                         style={{
                           width: "35px",
                           height: "35px",
@@ -674,21 +618,18 @@ export default function MobileHome() {
                   )}
                 </Button>
                 <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "flex-start",
-                    marginTop: "-15px",
-                  }}
+                  className="flex-col justify-center items-start mt-[-15px]"
+
                 >
-                  <span className="font-normal text-md">
+                  <span className="font-bold text-lg">
                     {" "}
                     {toData?.token ? toData?.token : "Coin name"}{" "}
                   </span>
-                  <span className="font-bold text-lg">
+                  <span className="font-normal text-xl text-[#52525B]">
                     {" "}
-                    {toData?.network ? toData?.network : "Network name"}{" "}
+                    {toData?.network
+                      ? toData?.network
+                      : "Network name"}{" "}
                   </span>
                 </div>
               </div>
@@ -714,25 +655,19 @@ export default function MobileHome() {
             </div>
           </div>
           <div
-            style={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              zIndex: 0,
-            }}
+            className="w-full flex justify-center items-center z-0"
           >
-             <input
-                  type="text"
-                  value={recieverAddress}
-                  onChange={(e) => {
-                    setRecieverAddress(e.target.value);
-                    console.log(recieverAddress);
-                    
-                  }}
-                  placeholder="Wallet Address"
-                  className="placeholder:text-[18px] text-[18px] bg-[#52525B] border-2 text-neutral-400 w-[100%] h-[40%] px-[16px] py-[12px] flex bg-transparent text-2xl focus:border-none float-right rounded-[22px]"
-                />
+            <input
+              type="text"
+              value={recieverAddress}
+              onChange={(e) => {
+                setRecieverAddress(e.target.value);
+                console.log(recieverAddress);
+
+              }}
+              placeholder="Wallet Address"
+              className="placeholder:text-[18px] text-[18px] bg-[#52525B] border-2 text-neutral-400 w-[100%] h-[40%] px-[16px] py-[12px] flex bg-transparent text-2xl focus:border-none float-right rounded-[22px]"
+            />
             {/* <CheckBalance
               location="bottom"
               tokenAddress={fromData.tokenAddress}
@@ -743,41 +678,28 @@ export default function MobileHome() {
       </div>
       {showAirouting && (
         <div
-          style={{
-            fontSize: "20px",
-            width: "95%",
-            fontWeight: "600",
-            borderTopLeftRadius: "20px",
-            borderTopRightRadius: "20px",
-            padding: "15px 33px",
-            marginTop: "29vh",
-          }}
-          className="w-full flex px-5 justify-between"
+          className="flex justify-between mx-4 text-[20px] text-white mt-[29vh] px-[20px] py-[15px]  bg-[#18181b] rounded-t-[24px]"
         >
-          <h1>AI Routing</h1> <TbRefresh />
+          <h1>AI Routing</h1> <TbRefresh
+            onClick={fetchTrades}
+            className={`${providerArray != null ? "cursor-pointer" : "cursor-wait"
+              } active:animate-spin`}
+          />
         </div>
       )}
       {showAirouting && (
         <div
-          style={{
-            width: "95%",
-            overflowY: "scroll",
-            padding: "15px",
-            display: "flex",
-            flexDirection: "column",
-            paddingTop: "10px",
-            gap: "10px",
-          }}
+          className=" h-[50vh] mx-4 p-[15px] bg-[#18181b] rounded-b-[30px] overflow-y-scroll pt-[10px] gap-y-[10px] space-y-2"
         >
-          {providerArray.length > 0 ? (
-            providerArray?.map((data, index) => 
-            data.dexName !== "rango" && <div key={index}>
-                     <RouteCard
-                      data={data}
-                      index={index}
-                      setTradeClicked={setTradeClicked}
-                    />
-                  </div>)
+          {providerArray?.length > 0 ? (
+            providerArray?.map((data, index) =>
+              data.dexName !== "rango" && <div key={index}>
+                <RouteCard
+                  data={data}
+                  index={index}
+                  setTradeClicked={setTradeClicked}
+                />
+              </div>)
           ) : (
             <>
               {[...Array(numberOfSkeletons)].map((_, index) => (
@@ -790,22 +712,22 @@ export default function MobileHome() {
         </div>
       )}
       {loading && (
-      <ScaleLoader
-        className="overlay"
-        color="#36d7b7"
-        style={{
-          position: "absolute",
-          top: "0",
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: "999",
-        }}
-      />
-    )}
+        <ScaleLoader
+          className="overlay"
+          color="#36d7b7"
+          style={{
+            position: "absolute",
+            top: "0",
+            width: "100vw",
+            height: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: "999",
+          }}
+        />
+      )}
     </div>
-    
+
   );
 }
