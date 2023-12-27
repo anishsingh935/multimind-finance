@@ -525,7 +525,7 @@ export default function Home() {
                   <input
                     type="number"
                     placeholder="Enter an Amount"
-                    className="bg-[#52525B] border-2 text-neutral-400 w-[100%] h-[40%] px-[16px] py-[12px] flex bg-transparent text-2xl border-none focus:border-none float-right rounded-[22px] inputclass"
+                    className="bg-[#52525B] border-2 text-neutral-400 w-[100%] h-[40%] px-[16px] py-[12px] flex bg-transparent text-2xl border-1 focus:border-none float-right rounded-[22px] inputclass"
                     value={fromData.amount}
                     step="0.01"
                     onInput={handleInput}
@@ -539,7 +539,7 @@ export default function Home() {
                 </div>
 
                 <div
-                   className="w-[45%] h-[180px] rounded-[24px] p-[20px] gap-[11px] bg-[#27272A] border-[1px] border-[#3F3F46] flex flex-col justify-center"
+                   className="w-[45%] h-[180px] rounded-[24px] p-[20px] gap-[11px] bg-[#27272A] border-[1px] border-[#242425] flex flex-col justify-center"
                 >
                   <div
                     className="h-[40%] flex flex-row items-center gap-[22px]"

@@ -618,7 +618,7 @@ export default function MobileHome() {
                   )}
                 </Button>
                 <div
-                  className="flex-col justify-center items-start mt-[-15px]"
+                  className="flex-col flex-wrap justify-center items-start mt-[-15px]"
 
                 >
                   <span className="font-bold text-lg">
@@ -691,7 +691,7 @@ export default function MobileHome() {
         <div
           className=" h-[50vh] mx-4 p-[15px] bg-[#18181b] rounded-b-[30px] overflow-y-scroll pt-[10px] gap-y-[10px] space-y-2"
         >
-          {providerArray?.length > 0 ? (
+          {providerArray.length > 0 ? (
             providerArray?.map((data, index) =>
               data.dexName !== "rango" && <div key={index}>
                 <RouteCard

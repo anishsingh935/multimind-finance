@@ -28,7 +28,7 @@ const RouteCard = ({ data, index , setTradeClicked }: Props) => {
       {index === 0 && (
         <Image
           alt="bar"
-          src="/bar.png"
+          src="/png/bar.png"
           width={280}
           height={30}
           className="mb-2"
@@ -50,16 +50,16 @@ const RouteCard = ({ data, index , setTradeClicked }: Props) => {
           )}
         </div>
         <div className="flex gap-2 pb-3 items-center justify-between border-b border-zinc-700">
-          <p>{data?.tokenAmount}</p>
+          <p className="text-white">{data?.tokenAmount}</p>
           <p className="text-[#71717A] text-[14px] font-[400]">~{data?.tokenAmount}{data?.tokenSymbol === "USDT" ? "$" : data?.tokenSymbol}</p>
         </div>
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">
-            <Image src="/timer.png" alt="icon" width={12} height={12} />
+            <Image src="/png/timer.png" alt="icon" width={12} height={12} />
             <p className="text-[#A1A1AA] text-[14px] font-[400]">1m</p>
           </div>
           <div className="flex gap-2 items-center">
-            <Image src="/fuel.png" alt="icon" width={12} height={12} />
+            <Image src="/png/fuel.png" alt="icon" width={12} height={12} />
             <p className="text-[#A1A1AA] text-[14px] font-[400]">~{data?.protocolFee}$</p>
           </div>
         </div>
