@@ -298,6 +298,7 @@ export default function Home() {
       const receipt = trade
         .swap({
           onConfirm: (hash: any) => console.log("Transaction Hash:", hash),
+          receiverAddress: recieverAddress
         })
         .then((hash) => {
           console.log("swap function called success");
