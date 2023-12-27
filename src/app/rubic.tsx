@@ -17,9 +17,9 @@ export const configuration: Configuration = {
     [BLOCKCHAIN_NAME.AVALANCHE]: {
       rpcList: ['https://api.avax.network/ext/bc/C/rpc']
     },
-    // [BLOCKCHAIN_NAME.SOLANA]: {
-    //   rpcList: ['https://solana-mainnet.g.alchemy.com/v2/stOJdVWT4BjrMBe_8TWlsOaiYl9HgAS5']
-    // },
+    [BLOCKCHAIN_NAME.SOLANA]: {
+      rpcList: ['https://solana-mainnet.g.alchemy.com/v2/stOJdVWT4BjrMBe_8TWlsOaiYl9HgAS5']
+    },
   },
   providerAddress: {
     [BLOCKCHAIN_NAME.ETHEREUM as keyof typeof BLOCKCHAIN_NAME]: {

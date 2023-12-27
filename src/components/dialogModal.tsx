@@ -131,12 +131,12 @@ function DialogModal({
                           key={index}
                           className="flex items-center px-2 my-1  cursor-pointer"
                           onClick={() => {
-                            if(coin?.name !== "Solana"){
+                            // if(coin?.name !== "Solana"){
                               handleTokenSelection(coin?.name, coin?.logoURI)
                               handleNetworkset(network?.name, network, network?.image);
-                            }
+                            // }
                           }}
-                          style={{ borderRadius: "35px",cursor: coin?.name === "Solana" ? "not-allowed" :"pointer" }}
+                          style={{ borderRadius: "35px"}}
                         >
                           <Image src={network?.image} width={30} height={30} alt="values" className="rounded-full mr-4" />
                           <div className="flex flex-col">
