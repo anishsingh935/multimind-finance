@@ -346,7 +346,7 @@ export default function MobileHome() {
 
       const receipt = trade
         .swap({
-          receiverAddress: recieverAddress
+          receiverAddress: recieverAddress,
           onConfirm: (hash: any) => console.log("Transaction Hash:", hash),
         })
         .then((hash) => {
